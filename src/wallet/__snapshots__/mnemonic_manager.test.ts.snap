@@ -1,0 +1,182 @@
+export const snapshot = {};
+
+snapshot[`MnemonicManager - Add generated mnemonic with encryption 1`] = `
+stdout:
+"? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store encrypted
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Generate a new mnemonic
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 1) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 1) › Mnemonic 1
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+"
+stderr:
+"Mnemonic stored securely.
+"
+`;
+
+snapshot[`MnemonicManager - Add generated mnemonic plaintext 1`] = `
+stdout:
+'? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic:
+  Store encrypted
+❯ Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store in plaintext
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Generate a new mnemonic
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 1) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 1) › Mnemonic 1
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+[
+  {
+    type: "plaintext",
+    label: "Mnemonic 1",
+    mnemonic: "test test test test test test test test test test test junk"
+  }
+]
+'
+stderr:
+"Mnemonic stored in plaintext.
+"
+`;
+
+snapshot[`MnemonicManager - Import mnemonic plaintext 1`] = `
+stdout:
+"? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic:
+  Store encrypted
+❯ Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store in plaintext
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic?
+  Generate a new mnemonic
+❯ Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Insert an existing mnemonic
+\\x1b[?25h\\x1b[?25h
+Please enter your mnemonic key one word at a time.
+? Enter word 1 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 1 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 2 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 2 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 3 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 3 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 4 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 4 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 5 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 5 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 6 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 6 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 7 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 7 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 8 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 8 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 9 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 9 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 10 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 10 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 11 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 11 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 12 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 12 of 12 › junk
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 1) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 1) › Mnemonic 1
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+"
+stderr:
+"Mnemonic stored in plaintext.
+"
+`;
+
+snapshot[`MnemonicManager - Import mnemonic encrypted 1`] = `
+stdout:
+"? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store encrypted
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic?
+  Generate a new mnemonic
+❯ Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Insert an existing mnemonic
+\\x1b[?25h\\x1b[?25h
+Please enter your mnemonic key one word at a time.
+? Enter word 1 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 1 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 2 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 2 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 3 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 3 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 4 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 4 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 5 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 5 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 6 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 6 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 7 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 7 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 8 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 8 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 9 of 12 › \\x1b[24G\\x1b[G\\x1b[0J
+? Enter word 9 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 10 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 10 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 11 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 11 of 12 › test
+\\x1b[?25h\\x1b[?25h? Enter word 12 of 12 › \\x1b[25G\\x1b[G\\x1b[0J
+? Enter word 12 of 12 › junk
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 1) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 1) › Mnemonic 1
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+"
+stderr:
+"Mnemonic stored securely.
+"
+`;
+
+snapshot[`MnemonicManager - Multiple mnemonics stored 1`] = `
+stdout:
+"? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic:
+  Store encrypted
+❯ Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store in plaintext
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Generate a new mnemonic
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 1) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 1) › Mnemonic 1
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+? Choose storage option for the mnemonic:
+❯ Store encrypted
+  Store in plaintext\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Choose storage option for the mnemonic: › Store encrypted
+\\x1b[?25h\\x1b[?25h? Generate or import a mnemonic?
+❯ Generate a new mnemonic
+  Insert an existing mnemonic\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Generate or import a mnemonic? › Generate a new mnemonic
+\\x1b[?25h\\x1b[?25h? Enter a label for this mnemonic: (Mnemonic 2) › \\x1b[51G\\x1b[G\\x1b[0J
+? Enter a label for this mnemonic: (Mnemonic 2) › Mnemonic 2
+\\x1b[?25h\\x1b[?25hMock writeKeystore called.
+"
+stderr:
+"Mnemonic stored in plaintext.
+Mnemonic stored securely.
+"
+`;

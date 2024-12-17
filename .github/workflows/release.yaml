@@ -1,0 +1,72 @@
+name: Release on tag 
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run:  |
+          docker build \
+            --build-arg USERNAME=$(whoami) \
+            --build-arg USER_UID=$(id -u) \
+            --build-arg USER_GID=$(id -g) \
+            --target devkit-deno \
+            -t deno-container \
+            -f .devcontainer/Dockerfile .
+
+      # - name: Run task release
+      #   run: |
+      #     docker run --name devkit-container \
+      #       -v ${{ github.workspace }}:/workspaces \
+      #       deno-container \
+      #       deno task release 
+      #     docker cp devkit-container:/bin/conflux ./release/usr/local/bin/
+      #     docker cp devkit-container:/bin/cfxkey ./release/usr/local/bin/
+      #     docker cp devkit-container:/bin/pos-genesis-tool ./release/usr/local/bin/
+      #     docker cp devkit-container:/bin/cfx-gen-dot ./release/usr/local/bin/
+      #     docker cp devkit-container:/bin/cfxstore ./release/usr/local/bin/
+      #     docker stop devkit-container
+      #     docker rm devkit-container
+      # - name: Tar release
+      #   run: tar -czvf devkit-${{  github.ref_name }}.tar.gz -C release usr/local/bin
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: devkit-${{  github.ref_name }}.tar.gz
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: .devcontainer/Dockerfile
+          context: .
+          target: cfx-deno-cli
+          push: true
+          tags: |
+            cfxdevkit/devkit-cli:${{ github.ref_name }}
+            cfxdevkit/devkit-cli:latest
+
+      - name: Log out from Docker Hub
+        run: docker logout

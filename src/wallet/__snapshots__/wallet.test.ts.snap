@@ -1,0 +1,8 @@
+export const snapshot = {};
+
+snapshot[`Wallet - Initialize keystore (no existing keystore) 1`] = `
+stdout:
+""
+stderr:
+""
+`;

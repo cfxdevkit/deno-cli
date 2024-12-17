@@ -1,0 +1,14 @@
+export const snapshot = {};
+
+snapshot[`EncryptionService - encrypt and decrypt mnemonic successfully 1`] = `
+stdout:
+"? Enter encryption password to secure your mnemonic. › \\x1b[56G\\x1b[G\\x1b[0J
+? Enter encryption password to secure your mnemonic. › ********\\x1b[64G\\x1b[G\\x1b[0J
+? Enter encryption password to secure your mnemonic. › ********
+\\x1b[?25h\\x1b[?25h? Password:  › \\x1b[16G\\x1b[G\\x1b[0J
+? Password:  › ********\\x1b[24G\\x1b[G\\x1b[0J
+? Password:  › ********
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;

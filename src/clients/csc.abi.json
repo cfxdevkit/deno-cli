@@ -1,0 +1,118 @@
+[
+	{
+		"type": "event",
+		"name": "Call",
+		"inputs": [
+			{ "name": "sender", "type": "bytes20", "indexed": true },
+			{ "name": "receiver", "type": "bytes20", "indexed": true },
+			{ "name": "value", "type": "uint256", "indexed": false },
+			{ "name": "nonce", "type": "uint256", "indexed": false },
+			{ "name": "data", "type": "bytes", "indexed": false }
+		]
+	},
+	{
+		"type": "event",
+		"name": "Create",
+		"inputs": [
+			{ "name": "sender", "type": "bytes20", "indexed": true },
+			{ "name": "contract_address", "type": "bytes20", "indexed": true },
+			{ "name": "value", "type": "uint256", "indexed": false },
+			{ "name": "nonce", "type": "uint256", "indexed": false },
+			{ "name": "init", "type": "bytes", "indexed": false }
+		]
+	},
+	{
+		"type": "event",
+		"name": "Withdraw",
+		"inputs": [
+			{ "name": "sender", "type": "bytes20", "indexed": true },
+			{ "name": "receiver", "type": "address", "indexed": true },
+			{ "name": "value", "type": "uint256", "indexed": false },
+			{ "name": "nonce", "type": "uint256", "indexed": false }
+		]
+	},
+	{
+		"type": "event",
+		"name": "Outcome",
+		"inputs": [
+			{ "name": "success", "type": "bool", "indexed": false }
+		]
+	},
+	{
+		"type": "function",
+		"name": "createEVM",
+		"stateMutability": "payable",
+		"inputs": [
+			{ "name": "init", "type": "bytes" }
+		],
+		"outputs": [
+			{ "name": "", "type": "bytes20" }
+		]
+	},
+	{
+		"type": "function",
+		"name": "transferEVM",
+		"stateMutability": "payable",
+		"inputs": [
+			{ "name": "to", "type": "bytes20" }
+		],
+		"outputs": [
+			{ "name": "output", "type": "bytes" }
+		]
+	},
+	{
+		"type": "function",
+		"name": "callEVM",
+		"stateMutability": "payable",
+		"inputs": [
+			{ "name": "to", "type": "bytes20" },
+			{ "name": "data", "type": "bytes" }
+		],
+		"outputs": [
+			{ "name": "output", "type": "bytes" }
+		]
+	},
+	{
+		"type": "function",
+		"name": "staticCallEVM",
+		"stateMutability": "view",
+		"inputs": [
+			{ "name": "to", "type": "bytes20" },
+			{ "name": "data", "type": "bytes" }
+		],
+		"outputs": [
+			{ "name": "output", "type": "bytes" }
+		]
+	},
+	{
+		"type": "function",
+		"name": "withdrawFromMapped",
+		"stateMutability": "nonpayable",
+		"inputs": [
+			{ "name": "value", "type": "uint256" }
+		],
+		"outputs": []
+	},
+	{
+		"type": "function",
+		"name": "mappedBalance",
+		"stateMutability": "view",
+		"inputs": [
+			{ "name": "addr", "type": "address" }
+		],
+		"outputs": [
+			{ "name": "", "type": "uint256" }
+		]
+	},
+	{
+		"type": "function",
+		"name": "mappedNonce",
+		"stateMutability": "view",
+		"inputs": [
+			{ "name": "addr", "type": "address" }
+		],
+		"outputs": [
+			{ "name": "", "type": "uint256" }
+		]
+	}
+]
