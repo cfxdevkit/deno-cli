@@ -1,5 +1,4 @@
 import { Command } from 'cliffy/command'
-import { CliSpinner } from './spinner.ts'
 import { Wallet } from './wallet/wallet.ts'
 import { KeyCode, parse } from 'cliffy/keycode'
 import { ServerManager } from './server.ts'
@@ -11,13 +10,13 @@ import { Input, Select } from 'cliffy/prompt'
 import { Address } from 'cive'
 import { isAddress as isEspaceAddress } from 'viem'
 import { isAddress as isCoreAddress } from 'cive/utils'
+import denojson from '../deno.json' with { type: 'json' }
 
 const CONFIG_FILE = join(Deno.env.get('HOME') || '', '.devkit.config.json')
 
 // Main CLI Class
 export class DevkitCLI {
 	private program: Command
-	private cs: CliSpinner
 	private wallet: Wallet
 	private config: Config | undefined
 	private txScan: TransactionMonitor
@@ -25,13 +24,12 @@ export class DevkitCLI {
 
 	constructor() {
 		ensureFileSync(CONFIG_FILE)
-		this.cs = new CliSpinner()
 		this.wallet = new Wallet()
 		this.txScan = new TransactionMonitor()
 
 		this.program = new Command()
-			.name('devkit-cli')
-			.version('1.0.0') // Replace with dynamic version if needed
+			.name('devkit')
+			.version(denojson.version) // Replace with dynamic version if needed
 			.description('CLI tool for Conflux development tasks.')
 			.action(() => {
 				this.program.showHelp()
