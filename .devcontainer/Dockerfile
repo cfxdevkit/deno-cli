@@ -64,8 +64,17 @@ ADD . $CONFLUX_ROOT
 RUN chown -R ${USERNAME}:${USERNAME} ${CONFLUX_ROOT}
 
 USER $USERNAME
-RUN cd $CONFLUX_ROOT && deno install --allow-scripts
-RUN echo "alias devkit='deno --allow-env --allow-read --allow-write --allow-ffi --allow-net=127.0.0.1 /opt/conflux/src/cli.ts'" >> ~/.bash_aliases
 
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/deno --allow-env --allow-read --allow-write --allow-ffi --allow-net=127.0.0.1 ${CONFLUX_ROOT}/src/cli.ts \"$@\"", "--"]
+# Define a reusable Deno permissions command
+ENV DENO_PERMISSIONS="deno --allow-env --allow-read --allow-write --allow-ffi --allow-net=127.0.0.1"
+ENV CLI_PATH="${CONFLUX_ROOT}/src/cli.ts"
+
+# Install Deno scripts
+RUN cd $CONFLUX_ROOT && deno install --allow-scripts
+
+# Add alias using the DENO_PERMISSIONS variable
+RUN echo "alias devkit='${DENO_PERMISSIONS} ${CLI_PATH}'" >> ~/.bash_aliases
+
+# Use DENO_PERMISSIONS in ENTRYPOINT
+ENTRYPOINT ["/bin/bash", "-c", "$DENO_PERMISSIONS ${CLI_PATH} \"$@\"", "--"]
 CMD ["start"]
