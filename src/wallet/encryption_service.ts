@@ -3,7 +3,7 @@ import { Secret } from 'cliffy/prompt'
 
 export class EncryptionService {
 	async deriveKeyFromPassword(reason: string, salt: Uint8Array): Promise<CryptoKey> {
-		const password = await Secret.prompt({ message: reason })
+		const password = await Secret.prompt({ message: reason, writer: Deno.stderr })
 		const encoder = new TextEncoder()
 		const passwordKey = await crypto.subtle.importKey(
 			'raw',

@@ -18,7 +18,7 @@ export class Wallet {
 	async initializeKeystore(): Promise<void> {
 		const existingKeystore = await this.keystoreManager.readKeystore()
 		if (!existingKeystore) {
-			console.log('No keystore found. Creating a default keystore...')
+			console.warn('No keystore found. Creating a default keystore...')
 			this.keystoreManager.getKeystore().push({
 				type: 'plaintext',
 				label: 'Default Keystore',
@@ -26,7 +26,7 @@ export class Wallet {
 			})
 			this.keystoreManager.setActiveIndex(0)
 			await this.keystoreManager.writeKeystore()
-			console.log('Default keystore created and activated.')
+			console.warn('Default keystore created and activated.')
 		} else {
 			this.keystoreManager.setKeystore(existingKeystore.keystore)
 			this.keystoreManager.setActiveIndex(existingKeystore.activeIndex)
