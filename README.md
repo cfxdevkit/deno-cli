@@ -2,7 +2,7 @@
 
 ## Overview
 
-`Devkit-CLI` is a powerful command-line interface (CLI) tool designed to assist developers working with Conflux blockchain. It provides an intuitive way to manage local development nodes, wallets, and essential utilities for testing and deployment tasks.
+`Devkit-CLI` is a command-line interface (CLI) tool designed to assist developers working with the Conflux blockchain. It provides an intuitive way to manage local development nodes, wallets, and essential utilities for testing and configuration.
 
 ---
 
@@ -10,16 +10,15 @@
 
 - **Node Management**:
   - Start, stop, and monitor a development node.
-  - View logs and errors produced by the node.
 - **Wallet Operations**:
   - Manage HDWallets, including mnemonic configuration and private key derivation.
-  - Derive Core and eSpace addresses from mnemonics or paths.
 - **Blockchain Utilities**:
-  - Check account balances.
-  - Use the faucet to fund Core and eSpace wallets.
-  - Scan nodes for transactions.
-- **Cross-Space Calls**:
-  - Simplified initialization and management of accounts across Core and eSpace networks.
+  - Fund Core and eSpace wallets using a built-in faucet.
+  - Scan nodes for transactions in real-time.
+- **Configuration Management**:
+  - View and update configuration settings for the development node.
+- **Cross-Space**:
+  - Simplified initialization and management of accounts across Core and eSpace networks from the same mnemonic.
 
 ---
 
@@ -34,62 +33,59 @@ devkit [command] [options]
 ### Commands
 
 #### Node Management
-- **`start`**: Start the development node.
-  - Options:
-    - `--logs`: Display logs after starting the node.
-    - `--scan`: Scan transactions after starting the node.
-- **`stop`**: Stop the development node.
-- **`status`**: Display the status of the development node.
-- **`logs`**: Show node logs.
-- **`errors`**: Display any errors produced by the node.
+- **`start`**: Start the development node and monitor transactions in real-time.
+  - Additional options and prompts will allow you to send funds via the faucet.
 
 #### Wallet Management
 - **`wallet`**: Configure and manage local HDWallets.
-  - **`mnemonic`**: Manage mnemonic phrases.
-    - `print`: Print the current mnemonic phrase.
-    - `configure`: Configure or import a new mnemonic phrase.
+  - **`add`**: Add or generate a new mnemonic in the keystore.
+  - **`select`**: Select the active mnemonic for use.
+  - **`show`**: Display the currently active mnemonic.
   - **`private-key`**: Manage private keys.
     - Options:
-      - `--derivation-path [path]`: Specify a custom derivation path.
-      - `--espace`: Use the eSpace network.
+      - `--derivation-path [path]`: Specify a custom derivation path for the private key.
+      - `--espace`: Use the eSpace network (default).
       - `--core`: Use the Core network.
-      - `--index [index]`: Specify the index for derivation.
-  - **`address`**: Derive addresses from mnemonic.
-    - Options:
-      - `--espace`: Use the eSpace network.
-      - `--core`: Use the Core network.
-      - `--index [index]`: Specify the index for derivation.
+      - `--index [index]`: Specify the index for key derivation (default: 0).
 
-#### Utilities
-- **`balance [address]`**: Check the balance of an address or the default genesis account.
-- **`faucet [amount] [address]`**: Fund Core and eSpace wallets.
-
-#### Blockchain Tools
-- **`scan`**: Scan the node for transactions.
-
+#### Configuration Management
+- **`config`**: View and update configuration settings.
+  - **`view`**: Display the current configuration.
+  - **`update`**: Interactively update configuration settings via a menu.
 ---
 
 ## Examples
 
 ### Starting the Node
 ```bash
-devkit start --logs
+devkit start
 ```
 
-### Viewing Balance
+This will initialize the development node and allow you to monitor transactions. Use the following shortcuts while monitoring:
+- **`f`**: Use the faucet to send funds.
+- **`q` or `Ctrl+C`**: Stop the node and exit.
+
+### Adding a Mnemonic
 ```bash
-devkit balance 0xYourAddressHere
+devkit wallet add
+```
+### Selecting active mnemonic
+```bash
+devkit wallet select
 ```
 
-### Funding a Wallet
+
+### Viewing Configuration
 ```bash
-devkit faucet 1000 0xRecipientAddress
+devkit config view
 ```
 
-### Configuring Mnemonic
+### Updating Configuration
 ```bash
-devkit wallet mnemonic configure
+devkit config update
 ```
+
+This will provide an interactive menu to update configuration options such as port numbers, chain IDs, and block intervals.
 
 ---
 
@@ -98,9 +94,13 @@ devkit wallet mnemonic configure
 To contribute or modify the CLI:
 
 1. Clone the repository.
-2. Install dependencies as specified in `deno.json`.
-3. Modify and test commands in the `src` directory.
+2. Modify and test commands in the `src` directory.
+3. Run the CLI locally using:
+   ```bash
+   deno run --allow-all src/devkit-cli.ts
+   ```
 
+---
 
 ## License
 
