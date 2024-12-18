@@ -90,8 +90,26 @@ RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use
 ENV NODE_PATH $NVM_DIR/versions/node/$NODE_VERSION/bin
 ENV PATH $NODE_PATH:$PATH
 
-ARG USERNAME=ubuntu
 FROM devkit-nvm AS devkit-hardhat
+USER $USERNAME
+RUN npm install -g npm@latest
+RUN npm install --global hardhat-shorthand \
+    && yes | hardhat-completion install
+
+FROM devkit-hardhat AS devkit-hardhat-core
+USER $USERNAME
+# Add the required configurations
+RUN printf '%s\n' \
+'if [ -t 0 ] && [ -z "${HARDHAT_VAR_DEPLOYER_ACCOUNT}" ]; then' \
+'    HARDHAT_VAR_DEPLOYER_ACCOUNT=$(devkit wallet private-key --core)' \
+'    if [ $? -eq 0 ] && [ -n "${HARDHAT_VAR_DEPLOYER_ACCOUNT}" ]; then' \
+'        export HARDHAT_VAR_DEPLOYER_ACCOUNT' \
+'    else' \
+'        echo "Failed to retrieve mnemonic or mnemonic is empty" >&2' \
+'    fi' \
+'fi' >> /home/${USERNAME}/.bashrc
+
+FROM devkit-hardhat AS devkit-hardhat-espace
 USER $USERNAME
 # Add the required configurations
 RUN printf '%s\n' \
@@ -103,6 +121,3 @@ RUN printf '%s\n' \
 '        echo "Failed to retrieve mnemonic or mnemonic is empty" >&2' \
 '    fi' \
 'fi' >> /home/${USERNAME}/.bashrc
-RUN npm install -g npm@latest
-RUN npm install --global hardhat-shorthand \
-    && yes | hardhat-completion install

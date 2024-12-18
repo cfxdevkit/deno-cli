@@ -27,22 +27,6 @@ jobs:
             -t deno-container \
             -f .devcontainer/Dockerfile .
 
-      # - name: Run task release
-      #   run: |
-      #     docker run --name devkit-container \
-      #       -v ${{ github.workspace }}:/workspaces \
-      #       deno-container \
-      #       deno task release 
-      #     docker cp devkit-container:/bin/conflux ./release/usr/local/bin/
-      #     docker cp devkit-container:/bin/cfxkey ./release/usr/local/bin/
-      #     docker cp devkit-container:/bin/pos-genesis-tool ./release/usr/local/bin/
-      #     docker cp devkit-container:/bin/cfx-gen-dot ./release/usr/local/bin/
-      #     docker cp devkit-container:/bin/cfxstore ./release/usr/local/bin/
-      #     docker stop devkit-container
-      #     docker rm devkit-container
-      # - name: Tar release
-      #   run: tar -czvf devkit-${{  github.ref_name }}.tar.gz -C release usr/local/bin
-
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -89,6 +73,28 @@ jobs:
           tags: |
             cfxdevkit/devkit-hardhat:${{ github.ref_name }}
             cfxdevkit/devkit-hardhat:latest
+
+      - name: Build and push devkit-hardhat-core Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: .devcontainer/Dockerfile
+          context: .
+          target: devkit-hardhat-core
+          push: true
+          tags: |
+            cfxdevkit/devkit-hardhat-core:${{ github.ref_name }}
+            cfxdevkit/devkit-hardhat-core:latest
+
+      - name: Build and push devkit-hardhat Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: .devcontainer/Dockerfile
+          context: .
+          target: devkit-hardhat-espace
+          push: true
+          tags: |
+            cfxdevkit/devkit-hardhat-espace:${{ github.ref_name }}
+            cfxdevkit/devkit-hardhat-espace:latest
 
       - name: Log out from Docker Hub
         run: docker logout
