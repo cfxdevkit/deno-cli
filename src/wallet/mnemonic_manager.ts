@@ -2,7 +2,7 @@ import { Input, Select } from 'cliffy/prompt'
 import { english } from 'viem/accounts'
 import { KeystoreManager } from './keystore_manager.ts'
 import { EncryptionService } from './encryption_service.ts'
-import { HDWallet } from '@conflux-dev/hdwallet'
+import { generateMnemonic } from 'bip39'
 
 export class MnemonicManager {
 	private keystoreManager: KeystoreManager
@@ -53,7 +53,7 @@ export class MnemonicManager {
 	}
 
 	generateMnemonic(): string {
-		return HDWallet.generateMnemonic()
+		return generateMnemonic()
 	}
 
 	private async importMnemonic(): Promise<string> {

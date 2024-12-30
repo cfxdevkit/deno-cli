@@ -1,14 +1,20 @@
-import { HDWallet } from '@conflux-dev/hdwallet'
 import { KeystoreManager } from './keystore_manager.ts'
 import { MnemonicManager } from './mnemonic_manager.ts'
 import { Select } from 'cliffy/prompt'
 import { generatePrivateKey } from 'viem/accounts'
 import { EncryptionService } from './encryption_service.ts'
+import * as bip39 from 'bip39'
+import { BIP32Factory } from 'bip32'
+import * as ecc from 'tiny-secp256k1'
+import { Buffer } from 'node:buffer'
+import { encode } from 'stablelib/hex'
+
+const bip32 = BIP32Factory(ecc)
 
 export class Wallet {
 	private keystoreManager: KeystoreManager
 	private mnemonicManager: MnemonicManager
-	private hdWallet?: HDWallet
+	private mnemonic?: string
 
 	constructor() {
 		this.keystoreManager = new KeystoreManager()
@@ -31,23 +37,20 @@ export class Wallet {
 			this.keystoreManager.setKeystore(existingKeystore.keystore)
 			this.keystoreManager.setActiveIndex(existingKeystore.activeIndex)
 		}
-		this.hdWallet = new HDWallet(await this.getActiveMnemonic())
+		this.mnemonic = await this.getActiveMnemonic()
 	}
 
 	async getActiveMnemonic(): Promise<string> {
 		if (this.keystoreManager.getActiveIndex() === null || this.keystoreManager.getActiveIndex() < 0) {
 			throw new Error('No active mnemonic selected.')
 		}
-		let mnemonic: string = ''
-		if (!this.hdWallet) {
+		if (!this.mnemonic) {
 			const mnemonicObj = this.keystoreManager.getKeystore()[this.keystoreManager.getActiveIndex()]
-			mnemonic = mnemonicObj.type === 'encoded'
+			return mnemonicObj.type === 'encoded'
 				? await this.mnemonicManager.encryptionService.decryptMnemonic(mnemonicObj.mnemonic)
 				: mnemonicObj.mnemonic
-		} else {
-			mnemonic = this.hdWallet.mnemonic
 		}
-		return mnemonic
+		return this.mnemonic
 	}
 
 	async addMnemonic(): Promise<void> {
@@ -67,7 +70,7 @@ export class Wallet {
 		this.keystoreManager.setActiveIndex(Number(selectedIndex))
 		await this.keystoreManager.writeKeystore()
 		if (Number(selectedIndex.value) !== currentIndex) {
-			this.hdWallet = new HDWallet(await this.getActiveMnemonic())
+			this.mnemonic = await this.getActiveMnemonic()
 		}
 		console.log(
 			`Active wallet set to: ${this.getActiveMnemonicLabel()}`,
@@ -86,15 +89,32 @@ export class Wallet {
 		return mnemonicObj.label
 	}
 
-	privateKeyByDerivationPath(derivationPath: string): string {
-		return `0x${this.hdWallet!.getPrivateKey(derivationPath).toString('hex')}`
+	private async derivePrivateKey(derivationPath: string): Promise<string> {
+		const mnemonic = await this.getActiveMnemonic()
+		if (!bip39.validateMnemonic(mnemonic)) {
+			throw new Error('Invalid mnemonic')
+		}
+
+		const seed = await bip39.mnemonicToSeed(mnemonic)
+		const root = bip32.fromSeed(Buffer.from(seed))
+		const child = root.derivePath(derivationPath)
+
+		if (!child.privateKey) {
+			throw new Error('Unable to derive private key')
+		}
+
+		return `0x${encode(child.privateKey)}`
 	}
 
-	espacePrivateKey(index: number): string {
-		return this.privateKeyByDerivationPath(`m/44'/60'/0'/0/${index}`)
+	privateKeyByDerivationPath(derivationPath: string): Promise<string> {
+		return this.derivePrivateKey(derivationPath)
 	}
 
-	corePrivateKey(index: number): string {
-		return this.privateKeyByDerivationPath(`m/44'/503'/0'/0/${index}`)
+	espacePrivateKey(index: number): Promise<string> {
+		return this.derivePrivateKey(`m/44'/60'/0'/0/${index}`)
+	}
+
+	corePrivateKey(index: number): Promise<string> {
+		return this.derivePrivateKey(`m/44'/503'/0'/0/${index}`)
 	}
 }
