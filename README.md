@@ -5,7 +5,11 @@
 `Devkit-CLI` is a command-line interface (CLI) tool designed to assist developers working with the Conflux blockchain. It provides an intuitive way to manage local development nodes, wallets, and essential utilities for testing and configuration.
 
 ---
+## 🚀 Getting Started
 
+For detailed information and step-by-step instructions on how to utilize this repository effectively, please refer to our comprehensive [**Wiki**](https://github.com/cfxdevkit/deno-cli/wiki).
+
+---
 ## Features
 
 - **Node Management**:
@@ -97,17 +101,21 @@ To contribute or modify the CLI:
 2. Modify and test commands in the `src` directory.
 3. Run the CLI locally using:
    ```bash
-   deno run --allow-all src/devkit-cli.ts
+   deno run --allow-all src/cli.ts
    ```
-
 ---
 
-## License
+## 📢 Need Help or Have Questions?
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+If you encounter issues or have questions related to this repository, you can:
 
----
+- **Raise an Issue:** Submit your query or report an issue using [this link](https://github.com/cfxdevkit/deno-cli/issues/new/choose).  
+- **Join the Community:** Connect with fellow Conflux developers and get assistance via:  
+  - **Telegram:** [ConfluxDevs](https://t.me/ConfluxDevs)  
+  - **Discord:** [Conflux Network Developers](https://discord.com/channels/707952293412339843/707952293856673887)  
 
-## Support
+## 🌐 Stay Connected
 
-For issues or feature requests, please open an issue on the [GitHub repository](https://github.com/your-repo/devkit-cli).
+Join the vibrant Conflux developer community and stay updated with the latest tools, tips, and discussions. Whether you're a seasoned developer or just getting started, we're here to help you succeed.
+
+Happy coding! 🚀
