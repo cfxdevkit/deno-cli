@@ -76,8 +76,8 @@ export class espaceClient {
 				account: this.account,
 				chain: this.chain,
 			})
-		} catch (error) {
-			throw new Error(`Transaction failed: ${error.message}`)
+		} catch (error: unknown) {
+			throw new Error(`Transaction failed: ${error instanceof Error ? error.message : String(error)}`)
 		}
 	}
 
@@ -87,8 +87,8 @@ export class espaceClient {
 		}
 		try {
 			return formatEther(await this.public.getBalance({ address: address }))
-		} catch (error) {
-			throw new Error(`Failed to get balance: ${error.message}`)
+		} catch (error: unknown) {
+			throw new Error(`Failed to get balance: ${error instanceof Error ? error.message : String(error)}`)
 		}
 	}
 
@@ -112,13 +112,13 @@ export class espaceClient {
 							try {
 								const tx = await this.public.getTransaction({ hash: element })
 								onNewTransaction(tx)
-							} catch (error) {
-								console.error(`Failed to get transaction ${element}: ${error.message}`)
+							} catch (error: unknown) {
+								console.error(`Failed to get transaction ${element}: ${error instanceof Error ? error.message : String(error)}`)
 							}
 						}),
 					)
-				} catch (error) {
-					console.error(`Failed to process block ${block.number}: ${error.message}`)
+				} catch (error: unknown) {
+					console.error(`Failed to process block ${block.number}: ${error instanceof Error ? error.message : String(error)}`)
 				}
 			},
 		})
@@ -155,8 +155,8 @@ export class espaceClient {
 				}),
 			])
 			return this.formatTokenAmount(balance, decimals)
-		} catch (error) {
-			throw new Error(`Failed to get token balance: ${error.message}`)
+		} catch (error: unknown) {
+			throw new Error(`Failed to get token balance: ${error instanceof Error ? error.message : String(error)}`)
 		}
 	}
 
@@ -166,8 +166,8 @@ export class espaceClient {
 		}
 		try {
 			await this.public.waitForTransactionReceipt({ hash })
-		} catch (error) {
-			throw new Error(`Failed to wait for transaction: ${error.message}`)
+		} catch (error: unknown) {
+				throw new Error(`Failed to wait for transaction: ${error instanceof Error ? error.message : String(error)}`)
 		}
 	}
 
