@@ -15,22 +15,27 @@ export class ServerManager {
 		this.cfg = config
 		const miner = wallet.generatePrivateKey()
 		if (this.cfg.chainId) {
-			const miner_account = privateKeyToAccount(
-				miner,
-				{ networkId: this.cfg.chainId },
-			)
-			this.cfg.miningAuthor = miner_account.address
-
-			this.cfg.genesisSecrets = Array.from({ length: 10 }, (_, i) => wallet.corePrivateKey(i) as `0x${string}`)
-			this.cfg.genesisSecrets.push(miner)
-
-			this.cfg.genesisEvmSecrets = Array.from(
-				{ length: 10 },
-				(_, i) => wallet.espacePrivateKey(i) as `0x${string}`,
-			)
-
-			this.minerWallet = new coreClient(this.cfg, this.cfg.genesisSecrets.length - 1)
+			this.initializeChain(wallet, miner).catch(console.error)
 		}
+	}
+
+	private async initializeChain(wallet: Wallet, miner: `0x${string}`) {
+		const miner_account = privateKeyToAccount(
+			miner,
+			{ networkId: this.cfg.chainId },
+		)
+		this.cfg.miningAuthor = miner_account.address
+
+		this.cfg.genesisSecrets = await Promise.all(
+			Array.from({ length: 10 }, (_, i) => wallet.corePrivateKey(i))
+		) as `0x${string}`[]
+		this.cfg.genesisSecrets.push(miner)
+
+		this.cfg.genesisEvmSecrets = await Promise.all(
+			Array.from({ length: 10 }, (_, i) => wallet.espacePrivateKey(i))
+		) as `0x${string}`[]
+
+		this.minerWallet = new coreClient(this.cfg, this.cfg.genesisSecrets.length - 1)
 	}
 
 	public async startServer() {
