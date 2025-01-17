@@ -6,7 +6,8 @@
 import { KeystoreManager } from './keystore_manager.ts'
 import { MnemonicManager } from './mnemonic_manager.ts'
 import { Select } from 'cliffy/prompt'
-import { generatePrivateKey } from 'viem/accounts'
+import { generatePrivateKey, privateKeyToAccount as espacePrivateKeyToAccount } from 'viem/accounts'
+import { privateKeyToAccount as corePrivateKeyToAccount } from 'cive/accounts'
 import { EncryptionService } from './encryption_service.ts'
 import * as bip39 from 'bip39'
 import { BIP32Factory } from 'bip32'
@@ -223,5 +224,15 @@ export class Wallet {
 				this.mnemonic = undefined
 			}
 		}
+	}
+
+	async espaceAddress(index: number): Promise<string> {
+		const privateKey = await this.espacePrivateKey(index)
+		return espacePrivateKeyToAccount(privateKey as `0x${string}`).address
+	}
+
+	async coreAddress(index: number): Promise<string> {
+		const privateKey = await this.corePrivateKey(index)
+		return corePrivateKeyToAccount(privateKey as `0x${string}`, { networkId: 1029 }).address
 	}
 }

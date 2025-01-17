@@ -161,6 +161,24 @@ export class DevkitCLI {
 				}
 			})
 
+		walletCommand
+			.command('address')
+			.description('Get wallet addresses')
+			.option('--espace [espace:boolean]', 'Use the eSpace network', { default: true })
+			.option('--core [core:boolean]', 'Use the core network')
+			.option('--index [index:number]', 'Index for address derivation', { default: 0 })
+			.action(async ({ espace, core, index }) => {
+				await this.wallet.initializeKeystore()
+
+				if (core) {
+					console.log(await this.wallet.coreAddress(index as number))
+				} else if (espace) {
+					console.log(await this.wallet.espaceAddress(index as number))
+				} else {
+					console.log('Invalid options.')
+				}
+			})
+
 		this.program.command('wallet', walletCommand)
 
 		const configCommand = new Command()

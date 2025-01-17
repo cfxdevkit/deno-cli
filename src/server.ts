@@ -29,44 +29,40 @@ export class ServerManager {
 	 * @param {Wallet} wallet - Wallet instance for key management
 	 * @param {Config} config - Server configuration
 	 */
-	constructor(wallet: Wallet, config: Config) {
+	constructor(private wallet: Wallet, private config: Config) {
 		this.cs = new CliSpinner()
-		this.cfg = config
-		const miner = wallet.generatePrivateKey()
-		if (this.cfg.chainId) {
-			this.initializeChain(wallet, miner).catch(console.error)
-		}
 	}
 
 	/**
 	 * Initializes the blockchain with necessary accounts and configurations
 	 * @private
-	 * @param {Wallet} wallet - Wallet instance for key management
-	 * @param {`0x${string}`} miner - Miner's private key
 	 * @throws {Error} If chain initialization fails
 	 */
-	private async initializeChain(wallet: Wallet, miner: `0x${string}`) {
+	private async initializeChain() {
 		try {
-			const miner_account = privateKeyToAccount(
-				miner,
-				{ networkId: this.cfg.chainId },
-			)
-			this.cfg.miningAuthor = miner_account.address
+			if (this.config.chainId) {
+				const miner = this.wallet.generatePrivateKey()
+				const miner_account = privateKeyToAccount(
+					miner,
+					{ networkId: this.config.chainId },
+				)
+				this.config.miningAuthor = miner_account.address
 
-			this.cfg.genesisSecrets = await Promise.all(
-				Array.from({ length: 10 }, (_, i) => wallet.corePrivateKey(i)),
-			).catch((error) => {
-				throw new Error(`Failed to generate core private keys: ${error.message}`)
-			}) as `0x${string}`[]
-			this.cfg.genesisSecrets.push(miner)
-
-			this.cfg.genesisEvmSecrets = await Promise.all(
-				Array.from({ length: 10 }, (_, i) => wallet.espacePrivateKey(i)),
-			).catch((error) => {
-				throw new Error(`Failed to generate evm private keys: ${error.message}`)
-			}) as `0x${string}`[]
-
-			this.minerWallet = new coreClient(this.cfg, this.cfg.genesisSecrets.length - 1)
+				this.config.genesisSecrets = await Promise.all(
+					Array.from({ length: 10 }, (_, i) => this.wallet.corePrivateKey(i)),
+				).catch((error) => {
+					throw new Error(`Failed to generate core private keys: ${error.message}`)
+				}) as `0x${string}`[]
+				this.config.genesisSecrets.push(miner)
+				this.config.genesisEvmSecrets = await Promise.all(
+					Array.from({ length: 10 }, (_, i) => this.wallet.espacePrivateKey(i)),
+				).catch((error) => {
+					throw new Error(`Failed to generate evm private keys: ${error.message}`)
+				}) as `0x${string}`[]
+				this.minerWallet = new coreClient(this.config, this.config.genesisSecrets.length - 1)
+			} else {
+				throw new Error('Chain ID is not set')
+			}
 		} catch (error) {
 			console.error('Failed to initialize chain:', error)
 			throw error
@@ -80,7 +76,8 @@ export class ServerManager {
 	 */
 	public async startServer() {
 		this.cs.start('Starting the Conflux Node...')
-		this.server = await createServer(this.cfg)
+		await this.initializeChain()
+		this.server = await createServer(this.config)
 		await this.server.start()
 		this.cs.succeed('Node started successfully!')
 	}
@@ -99,7 +96,7 @@ export class ServerManager {
 	 * @returns {Config} The current configuration
 	 */
 	public getConfig(): Config {
-		return this.cfg
+		return this.config
 	}
 
 	/**
