@@ -1,3 +1,8 @@
+/**
+ * eSpace client module for interacting with the Conflux eSpace network
+ * @module EspaceClient
+ */
+
 import {
 	Account,
 	Address,
@@ -17,6 +22,10 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { Config } from '@xcfx/node'
 import { Block, Transaction } from '../types.ts'
 
+/**
+ * Client for interacting with Conflux eSpace (EVM compatible space)
+ * @class espaceClient
+ */
 export class espaceClient {
 	private account: Account
 	private public: PublicClient
@@ -24,6 +33,13 @@ export class espaceClient {
 	private cfg: Config
 	private chain: Chain
 	public address: Address
+
+	/**
+	 * Creates a new eSpace client instance
+	 * @constructor
+	 * @param {Config} cfg - Node configuration
+	 * @throws {Error} If configuration is invalid
+	 */
 	constructor(cfg: Config) {
 		if (!cfg.evmChainId) {
 			throw new Error('Invalid configuration: Missing evmChainId')
@@ -62,6 +78,14 @@ export class espaceClient {
 		})
 	}
 
+	/**
+	 * Sends a transaction to transfer CFX
+	 * @async
+	 * @param {Address} address - Recipient address
+	 * @param {string} amount - Amount to send in CFX
+	 * @returns {Promise<`0x${string}`>} Transaction hash
+	 * @throws {Error} If address is invalid, amount is invalid, or transaction fails
+	 */
 	async sendTransaction(address: Address, amount: string) {
 		if (!isAddress(address)) {
 			throw new Error('Invalid address: Address cannot be empty')
@@ -81,6 +105,13 @@ export class espaceClient {
 		}
 	}
 
+	/**
+	 * Gets the balance of an address
+	 * @async
+	 * @param {Address} address - Address to check balance for
+	 * @returns {Promise<string>} Balance in CFX
+	 * @throws {Error} If address is invalid or balance check fails
+	 */
 	async getBalance(address: Address): Promise<string> {
 		if (!isAddress(address)) {
 			throw new Error('Invalid address')
@@ -92,6 +123,12 @@ export class espaceClient {
 		}
 	}
 
+	/**
+	 * Watches for new blocks and transactions
+	 * @param {function} onNewBlock - Callback for new blocks
+	 * @param {function} onNewTransaction - Callback for new transactions
+	 * @returns {function} Unsubscribe function
+	 */
 	watchTx(
 		onNewBlock = (block: Block) => console.log('Block Number:', block.number),
 		onNewTransaction = (transactionDetails: Transaction) => console.log('Transaction Details:', transactionDetails),
@@ -124,6 +161,13 @@ export class espaceClient {
 		})
 	}
 
+	/**
+	 * Gets the balance of a token
+	 * @async
+	 * @param {Address} tokenAddress - Token contract address
+	 * @returns {Promise<string>} Token balance
+	 * @throws {Error} If token address is invalid or balance check fails
+	 */
 	async getTokenBalance(tokenAddress: Address): Promise<string> {
 		if (!isAddress(tokenAddress)) {
 			throw new Error('Invalid token address')
@@ -160,6 +204,13 @@ export class espaceClient {
 		}
 	}
 
+	/**
+	 * Waits for a transaction to be confirmed
+	 * @async
+	 * @param {`0x${string}`} hash - Transaction hash
+	 * @returns {Promise<void>}
+	 * @throws {Error} If hash format is invalid or waiting fails
+	 */
 	async waitForTransaction(hash: `0x${string}`): Promise<void> {
 		if (!hash.startsWith('0x')) {
 			throw new Error('Invalid transaction hash format')
@@ -171,6 +222,12 @@ export class espaceClient {
 		}
 	}
 
+	/**
+	 * Formats a token amount with proper decimals
+	 * @param {bigint | string} amount - Raw token amount
+	 * @param {number} decimals - Token decimals
+	 * @returns {string} Formatted token amount
+	 */
 	formatTokenAmount(amount: bigint | string, decimals: number): string {
 		const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount
 		const formatted = formatUnits(amountBigInt, decimals)

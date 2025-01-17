@@ -1,5 +1,5 @@
 /coverage
-/documentation
+#/documentation
 /bin
 /release
 /node_modules

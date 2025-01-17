@@ -1,18 +1,38 @@
+/**
+ * Mnemonic management module for handling wallet seed phrases
+ * @module MnemonicManager
+ */
+
 import { Input, Select } from 'cliffy/prompt'
 import { english } from 'viem/accounts'
 import { KeystoreManager } from './keystore_manager.ts'
 import { EncryptionService } from './encryption_service.ts'
 import { generateMnemonic } from 'bip39'
 
+/**
+ * Manages mnemonic operations including generation, import, and storage
+ * @class MnemonicManager
+ */
 export class MnemonicManager {
 	private keystoreManager: KeystoreManager
 	public encryptionService: EncryptionService
 
+	/**
+	 * Creates a new mnemonic manager instance
+	 * @constructor
+	 * @param {KeystoreManager} keystoreManager - Keystore manager instance
+	 * @param {EncryptionService} encryptionService - Encryption service instance
+	 */
 	constructor(keystoreManager: KeystoreManager, encryptionService: EncryptionService) {
 		this.keystoreManager = keystoreManager
 		this.encryptionService = encryptionService
 	}
 
+	/**
+	 * Adds a new mnemonic to the keystore
+	 * @async
+	 * @returns {Promise<void>}
+	 */
 	async addMnemonic(): Promise<void> {
 		const storageChoice = await Select.prompt({
 			message: 'Choose storage option for the mnemonic:',
@@ -41,6 +61,12 @@ export class MnemonicManager {
 		console.error(storageChoice === 'p' ? 'Mnemonic stored in plaintext.' : 'Mnemonic stored securely.')
 	}
 
+	/**
+	 * Prompts user to generate or import a mnemonic
+	 * @private
+	 * @async
+	 * @returns {Promise<string>} The mnemonic phrase
+	 */
 	private async promptForMnemonic(): Promise<string> {
 		const userChoice = await Select.prompt({
 			message: 'Generate or import a mnemonic?',
@@ -52,10 +78,20 @@ export class MnemonicManager {
 		return userChoice === 'i' ? await this.importMnemonic() : this.generateMnemonic()
 	}
 
+	/**
+	 * Generates a new BIP-39 mnemonic phrase
+	 * @returns {string} Generated mnemonic phrase
+	 */
 	generateMnemonic(): string {
 		return generateMnemonic()
 	}
 
+	/**
+	 * Prompts user to input an existing mnemonic phrase
+	 * @private
+	 * @async
+	 * @returns {Promise<string>} The imported mnemonic phrase
+	 */
 	private async importMnemonic(): Promise<string> {
 		console.log('\nPlease enter your mnemonic key one word at a time.')
 		const words: string[] = []
@@ -71,6 +107,12 @@ export class MnemonicManager {
 		return words.join(' ')
 	}
 
+	/**
+	 * Deletes a mnemonic from the keystore
+	 * @async
+	 * @param {number} index - Index of the mnemonic to delete
+	 * @throws {Error} If index is invalid or trying to delete default mnemonic
+	 */
 	async deleteMnemonic(index: number): Promise<void> {
 		const keystore = this.keystoreManager.getKeystore()
 		if (index < 0 || index >= keystore.length) {

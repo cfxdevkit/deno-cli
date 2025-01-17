@@ -1,3 +1,8 @@
+/**
+ * Wallet management module for handling HD wallets and key derivation
+ * @module Wallet
+ */
+
 import { KeystoreManager } from './keystore_manager.ts'
 import { MnemonicManager } from './mnemonic_manager.ts'
 import { Select } from 'cliffy/prompt'
@@ -11,16 +16,29 @@ import { encode } from 'stablelib/hex'
 
 const bip32 = BIP32Factory(ecc)
 
+/**
+ * Manages HD wallet operations including key derivation and mnemonic management
+ * @class Wallet
+ */
 export class Wallet {
 	private keystoreManager: KeystoreManager
 	private mnemonicManager: MnemonicManager
 	private mnemonic?: string
 
+	/**
+	 * Creates a new wallet instance
+	 * @constructor
+	 */
 	constructor() {
 		this.keystoreManager = new KeystoreManager()
 		this.mnemonicManager = new MnemonicManager(this.keystoreManager, new EncryptionService())
 	}
 
+	/**
+	 * Initializes the keystore with a default mnemonic if none exists
+	 * @async
+	 * @returns {Promise<void>}
+	 */
 	async initializeKeystore(): Promise<void> {
 		const existingKeystore = await this.keystoreManager.readKeystore()
 		if (!existingKeystore) {
@@ -40,6 +58,12 @@ export class Wallet {
 		this.mnemonic = await this.getActiveMnemonic()
 	}
 
+	/**
+	 * Gets the currently active mnemonic
+	 * @async
+	 * @returns {Promise<string>} The active mnemonic phrase
+	 * @throws {Error} If no active mnemonic is selected
+	 */
 	async getActiveMnemonic(): Promise<string> {
 		if (this.keystoreManager.getActiveIndex() === null || this.keystoreManager.getActiveIndex() < 0) {
 			throw new Error('No active mnemonic selected.')
@@ -53,10 +77,20 @@ export class Wallet {
 		return this.mnemonic
 	}
 
+	/**
+	 * Adds a new mnemonic to the keystore
+	 * @async
+	 * @returns {Promise<void>}
+	 */
 	async addMnemonic(): Promise<void> {
 		await this.mnemonicManager.addMnemonic()
 	}
 
+	/**
+	 * Prompts user to select an active mnemonic
+	 * @async
+	 * @returns {Promise<void>}
+	 */
 	async selectActiveMnemonic(): Promise<void> {
 		const currentIndex = this.keystoreManager.getActiveIndex()
 		const selectedIndex = await Select.prompt({
@@ -77,10 +111,19 @@ export class Wallet {
 		)
 	}
 
+	/**
+	 * Generates a new random private key
+	 * @returns {`0x${string}`} Generated private key
+	 */
 	generatePrivateKey(): `0x${string}` {
 		return generatePrivateKey()
 	}
 
+	/**
+	 * Gets the label of the active mnemonic
+	 * @returns {string} Active mnemonic label
+	 * @throws {Error} If no active mnemonic is selected
+	 */
 	getActiveMnemonicLabel(): string {
 		if (this.keystoreManager.getActiveIndex() === null || this.keystoreManager.getActiveIndex() < 0) {
 			throw new Error('No active mnemonic selected.')
@@ -89,6 +132,14 @@ export class Wallet {
 		return mnemonicObj.label
 	}
 
+	/**
+	 * Derives a private key from the active mnemonic using a derivation path
+	 * @private
+	 * @async
+	 * @param {string} derivationPath - BIP32 derivation path
+	 * @returns {Promise<string>} Derived private key
+	 * @throws {Error} If mnemonic is invalid or derivation fails
+	 */
 	private async derivePrivateKey(derivationPath: string): Promise<string> {
 		const mnemonic = await this.getActiveMnemonic()
 		if (!bip39.validateMnemonic(mnemonic)) {
@@ -106,18 +157,42 @@ export class Wallet {
 		return `0x${encode(child.privateKey)}`
 	}
 
+	/**
+	 * Derives a private key using a custom derivation path
+	 * @async
+	 * @param {string} derivationPath - BIP32 derivation path
+	 * @returns {Promise<string>} Derived private key
+	 */
 	privateKeyByDerivationPath(derivationPath: string): Promise<string> {
 		return this.derivePrivateKey(derivationPath)
 	}
 
+	/**
+	 * Derives an eSpace private key at a specific index
+	 * @async
+	 * @param {number} index - Derivation index
+	 * @returns {Promise<string>} Derived private key
+	 */
 	espacePrivateKey(index: number): Promise<string> {
 		return this.derivePrivateKey(`m/44'/60'/0'/0/${index}`)
 	}
 
+	/**
+	 * Derives a Core private key at a specific index
+	 * @async
+	 * @param {number} index - Derivation index
+	 * @returns {Promise<string>} Derived private key
+	 */
 	corePrivateKey(index: number): Promise<string> {
 		return this.derivePrivateKey(`m/44'/503'/0'/0/${index}`)
 	}
 
+	/**
+	 * Deletes a mnemonic from the keystore
+	 * @async
+	 * @returns {Promise<void>}
+	 * @throws {Error} If there are no additional mnemonics to delete
+	 */
 	async deleteMnemonic(): Promise<void> {
 		const keystore = this.keystoreManager.getKeystore()
 		if (keystore.length <= 1) {
