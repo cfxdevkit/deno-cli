@@ -8,9 +8,9 @@ import {
 	Chain,
 	createPublicClient,
 	createWalletClient,
+	formatCFX,
 	http,
 	parseCFX,
-	formatCFX,
 	PublicClient,
 	WalletClient,
 } from 'cive'
@@ -197,16 +197,28 @@ export class coreClient {
 										const tx = await this.public.getTransaction({ hash: txHash })
 										onNewTransaction(tx as Transaction)
 									} catch (error: unknown) {
-										console.error(`Failed to get transaction ${txHash}: ${error instanceof Error ? error.message : String(error)}`)
+										console.error(
+											`Failed to get transaction ${txHash}: ${
+												error instanceof Error ? error.message : String(error)
+											}`,
+										)
 									}
 								}),
 							)
 						} catch (error: unknown) {
-							console.error(`Failed to process block ${hash}: ${error instanceof Error ? error.message : String(error)}`)
+							console.error(
+								`Failed to process block ${hash}: ${
+									error instanceof Error ? error.message : String(error)
+								}`,
+							)
 						}
 					}
 				} catch (error: unknown) {
-					console.error(`Failed to get blocks for epoch ${epochNumber}: ${error instanceof Error ? error.message : String(error)}`)
+					console.error(
+						`Failed to get blocks for epoch ${epochNumber}: ${
+							error instanceof Error ? error.message : String(error)
+						}`,
+					)
 				}
 			},
 		})

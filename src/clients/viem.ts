@@ -150,12 +150,20 @@ export class espaceClient {
 								const tx = await this.public.getTransaction({ hash: element })
 								onNewTransaction(tx)
 							} catch (error: unknown) {
-								console.error(`Failed to get transaction ${element}: ${error instanceof Error ? error.message : String(error)}`)
+								console.error(
+									`Failed to get transaction ${element}: ${
+										error instanceof Error ? error.message : String(error)
+									}`,
+								)
 							}
 						}),
 					)
 				} catch (error: unknown) {
-					console.error(`Failed to process block ${block.number}: ${error instanceof Error ? error.message : String(error)}`)
+					console.error(
+						`Failed to process block ${block.number}: ${
+							error instanceof Error ? error.message : String(error)
+						}`,
+					)
 				}
 			},
 		})
@@ -218,7 +226,7 @@ export class espaceClient {
 		try {
 			await this.public.waitForTransactionReceipt({ hash })
 		} catch (error: unknown) {
-				throw new Error(`Failed to wait for transaction: ${error instanceof Error ? error.message : String(error)}`)
+			throw new Error(`Failed to wait for transaction: ${error instanceof Error ? error.message : String(error)}`)
 		}
 	}
 
