@@ -180,3 +180,37 @@ stderr:
 Mnemonic stored securely.
 "
 `;
+
+snapshot[`MnemonicManager - Cannot delete default mnemonic 1`] = `
+stdout:
+""
+stderr:
+""
+`;
+
+snapshot[`MnemonicManager - Delete non-default mnemonic 1`] = `
+stdout:
+"Mock writeKeystore called.
+Mnemonic deleted successfully.
+"
+stderr:
+""
+`;
+
+snapshot[`MnemonicManager - Delete active mnemonic updates active index 1`] = `
+stdout:
+"Mock writeKeystore called.
+Mnemonic deleted successfully.
+"
+stderr:
+""
+`;
+
+snapshot[`MnemonicManager - Delete mnemonic updates subsequent active index 1`] = `
+stdout:
+"Mock writeKeystore called.
+Mnemonic deleted successfully.
+"
+stderr:
+""
+`;

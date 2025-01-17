@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert'
+import { assertEquals, assertRejects } from '@std/assert'
 import { ansi } from 'cliffy/ansi'
 import { snapshotTest } from 'cliffy/testing'
 import { EncryptionService } from './encryption_service.ts'
@@ -52,6 +52,12 @@ mockEncryptionService.encryptMnemonic = async (_mnemonic) => `encrypted:${mnemon
 
 const mnemonicManager = new MnemonicManager(mockKeystoreManager, mockEncryptionService)
 mnemonicManager.generateMnemonic = () => mnemonic
+
+// Add a helper function to reset the mock keystore
+function resetMockKeystore() {
+	mockKeystoreManager.setKeystore([])
+	mockKeystoreManager.setActiveIndex(0)
+}
 
 await snapshotTest({
 	name: 'MnemonicManager - Add generated mnemonic with encryption',
@@ -236,4 +242,82 @@ await snapshotTest({
 		assertEquals(keystore[0].label, 'Mnemonic 1')
 		assertEquals(keystore[1].label, 'Mnemonic 2')
 	},
+})
+
+// Add new tests for delete functionality
+await snapshotTest({
+	name: 'MnemonicManager - Cannot delete default mnemonic',
+	meta: import.meta,
+	async fn() {
+		resetMockKeystore()
+		mockKeystoreManager.setKeystore([
+			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic }
+		])
+
+		await assertRejects(
+			async () => {
+				await mnemonicManager.deleteMnemonic(0)
+			},
+			Error,
+			'Cannot delete the default mnemonic as it serves as a fallback'
+		)
+	}
+})
+
+await snapshotTest({
+	name: 'MnemonicManager - Delete non-default mnemonic',
+	meta: import.meta,
+	async fn() {
+		resetMockKeystore()
+		mockKeystoreManager.setKeystore([
+			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
+			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2 test2 test2' }
+		])
+		mockKeystoreManager.setActiveIndex(1)
+
+		await mnemonicManager.deleteMnemonic(1)
+
+		const keystore = mockKeystoreManager.getKeystore()
+		assertEquals(keystore.length, 1)
+		assertEquals(keystore[0].label, 'Default Keystore')
+		assertEquals(mockKeystoreManager.getActiveIndex(), 0)
+	}
+})
+
+await snapshotTest({
+	name: 'MnemonicManager - Delete active mnemonic updates active index',
+	meta: import.meta,
+	async fn() {
+		resetMockKeystore()
+		mockKeystoreManager.setKeystore([
+			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
+			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2' },
+			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' }
+		])
+		mockKeystoreManager.setActiveIndex(2)
+
+		await mnemonicManager.deleteMnemonic(2)
+
+		assertEquals(mockKeystoreManager.getActiveIndex(), 0)
+		assertEquals(mockKeystoreManager.getKeystore().length, 2)
+	}
+})
+
+await snapshotTest({
+	name: 'MnemonicManager - Delete mnemonic updates subsequent active index',
+	meta: import.meta,
+	async fn() {
+		resetMockKeystore()
+		mockKeystoreManager.setKeystore([
+			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
+			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2' },
+			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' }
+		])
+		mockKeystoreManager.setActiveIndex(2)
+
+		await mnemonicManager.deleteMnemonic(1)
+
+		assertEquals(mockKeystoreManager.getActiveIndex(), 1)
+		assertEquals(mockKeystoreManager.getKeystore().length, 2)
+	}
 })

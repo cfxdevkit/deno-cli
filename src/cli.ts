@@ -117,6 +117,14 @@ export class DevkitCLI {
 			})
 
 		walletCommand
+			.command('delete')
+			.description('Delete a mnemonic from the keystore (except default)')
+			.action(async () => {
+				await this.wallet.initializeKeystore()
+				await this.wallet.deleteMnemonic()
+			})
+
+		walletCommand
 			.command('select')
 			.description('Select the currently active mnemonic')
 			.action(async () => {

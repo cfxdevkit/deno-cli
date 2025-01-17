@@ -117,4 +117,36 @@ export class Wallet {
 	corePrivateKey(index: number): Promise<string> {
 		return this.derivePrivateKey(`m/44'/503'/0'/0/${index}`)
 	}
+
+	async deleteMnemonic(): Promise<void> {
+		const keystore = this.keystoreManager.getKeystore()
+		if (keystore.length <= 1) {
+			throw new Error('No additional mnemonics to delete')
+		}
+
+		const selectedIndex = await Select.prompt({
+			message: 'Select the mnemonic to delete:',
+			options: keystore.slice(1).map((mnemonicObj, index) => ({
+				name: `${mnemonicObj.label}${index + 1 === this.keystoreManager.getActiveIndex() ? ' (active)' : ''}`,
+				value: String(index + 1),
+			})),
+		})
+
+		// Confirm deletion
+		const confirm = await Select.prompt({
+			message: 'Are you sure you want to delete this mnemonic?',
+			options: [
+				{ name: 'No, cancel', value: 'no' },
+				{ name: 'Yes, delete', value: 'yes' },
+			],
+		})
+
+		if (confirm === 'yes') {
+			await this.mnemonicManager.deleteMnemonic(Number(selectedIndex))
+			// Reset the cached mnemonic if we deleted the active one
+			if (Number(selectedIndex) === this.keystoreManager.getActiveIndex()) {
+				this.mnemonic = undefined
+			}
+		}
+	}
 }

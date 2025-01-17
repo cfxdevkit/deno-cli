@@ -10,6 +10,7 @@
     "hooks:pre-commit": "deno check *.ts && deno lint && deno fmt --check",
     "bump": "deno fmt && deno run -A jsr:@mys/bump@1",
     "test": "deno test --allow-env --allow-read --allow-write --allow-run  --coverage --clean && deno coverage --html",
+    "test_update": "deno test --allow-env --allow-read --allow-write --allow-run -- --update",
     "doc": "deno doc --html --name='DevKit CLI' --output=./documentation/ ./mod.ts",
     "cli": "deno run --allow-env --allow-read --allow-sys --allow-ffi --allow-write --allow-run --allow-net --unstable-kv src/cli.ts",
     "release": "deno compile --allow-env --allow-read --allow-sys --allow-ffi --allow-write --allow-run --allow-net --unstable-kv --target x86_64-unknown-linux-gnu  --output ./release/usr/local/bin/devkit src/cli.ts"

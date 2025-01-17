@@ -70,4 +70,32 @@ export class MnemonicManager {
 		}
 		return words.join(' ')
 	}
+
+	async deleteMnemonic(index: number): Promise<void> {
+		const keystore = this.keystoreManager.getKeystore()
+		if (index < 0 || index >= keystore.length) {
+			throw new Error('Invalid mnemonic index')
+		}
+
+		// Prevent deletion of the default mnemonic
+		if (index === 0) {
+			throw new Error('Cannot delete the default mnemonic as it serves as a fallback')
+		}
+
+		// Remove the mnemonic at the specified index
+		keystore.splice(index, 1)
+
+		// If we deleted the active mnemonic, update the active index
+		const activeIndex = this.keystoreManager.getActiveIndex()
+		if (activeIndex === index) {
+			// Set to default mnemonic (index 0) when active is deleted
+			this.keystoreManager.setActiveIndex(0)
+		} else if (activeIndex > index) {
+			// If the active index was after the deleted one, decrement it
+			this.keystoreManager.setActiveIndex(activeIndex - 1)
+		}
+
+		await this.keystoreManager.writeKeystore()
+		console.log('Mnemonic deleted successfully.')
+	}
 }
