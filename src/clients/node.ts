@@ -86,15 +86,15 @@ export class TransactionMonitor {
 		const cBlockNum = yellow(String(this.coreBlock?.number))
 		const eBlock = green('Espace Block:')
 		const eBlockNum = yellow(String(this.espaceBlock?.number))
-		
+
 		const fullMsg = `${timestamp} | ${cBlock} ${cBlockNum} | ${eBlock} ${eBlockNum} | ${this.footer}`
-		
+
 		const { columns } = getTerminalSize()
 		const maxLength = columns - 2
-		
+
 		const truncatedMsg = truncateText(fullMsg, maxLength)
 		const msg = bold(gray(truncatedMsg))
-		
+
 		this.cs.start(msg)
 	}
 

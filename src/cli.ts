@@ -318,7 +318,7 @@ export class DevkitCLI {
 			})
 
 			if (address) {
-				const balance = isEspaceAddress(address) 
+				const balance = isEspaceAddress(address)
 					? await this.txScan.espaceClient?.getBalance(address as `0x${string}`)
 					: await this.txScan.coreClient?.getBalance(address as Address)
 

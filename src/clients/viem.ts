@@ -4,13 +4,13 @@ import {
 	Chain,
 	createPublicClient,
 	createWalletClient,
+	formatEther,
 	formatUnits,
 	http,
 	isAddress,
 	parseEther,
 	PublicClient,
 	WalletClient,
-	formatEther
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 

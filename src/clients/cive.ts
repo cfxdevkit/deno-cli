@@ -3,9 +3,9 @@ import {
 	Chain,
 	createPublicClient,
 	createWalletClient,
+	formatCFX,
 	http,
 	parseCFX,
-	formatCFX,
 	PublicClient,
 	WalletClient,
 } from 'cive'
