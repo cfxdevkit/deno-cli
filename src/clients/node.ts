@@ -6,6 +6,7 @@ import { CliSpinner } from '../spinner.ts'
 import { formatCFX } from 'cive'
 import { formatEther } from 'viem'
 import { Block, BlockInfo, Transaction } from '../types.ts'
+import { getTerminalSize, truncateText } from '../utils/terminal.ts'
 
 export class TransactionMonitor {
 	public coreClient?: coreClient
@@ -85,7 +86,15 @@ export class TransactionMonitor {
 		const cBlockNum = yellow(String(this.coreBlock?.number))
 		const eBlock = green('Espace Block:')
 		const eBlockNum = yellow(String(this.espaceBlock?.number))
-		const msg = bold(gray(`${timestamp} | ${cBlock} ${cBlockNum} | ${eBlock} ${eBlockNum} | ${this.footer}`))
+		
+		const fullMsg = `${timestamp} | ${cBlock} ${cBlockNum} | ${eBlock} ${eBlockNum} | ${this.footer}`
+		
+		const { columns } = getTerminalSize()
+		const maxLength = columns - 2
+		
+		const truncatedMsg = truncateText(fullMsg, maxLength)
+		const msg = bold(gray(truncatedMsg))
+		
 		this.cs.start(msg)
 	}
 

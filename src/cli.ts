@@ -84,7 +84,7 @@ export class DevkitCLI {
 					await this.server.startServer()
 					const cfg = this.server.getConfig()
 					this.txScan.initializeClients(cfg)
-					this.txScan.setFooter(`${this.wallet.getActiveMnemonicLabel()} | [f]: Faucet [b]: Balance [q]: Quit`)
+					this.txScan.setFooter(`${this.wallet.getActiveMnemonicLabel()} | [F]aucet [B]alance [Q]uit`)
 
 					this.txScan.watchTransactions()
 
