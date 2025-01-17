@@ -5,6 +5,7 @@ import {
 	createWalletClient,
 	http,
 	parseCFX,
+	formatCFX,
 	PublicClient,
 	WalletClient,
 } from 'cive'
@@ -69,12 +70,12 @@ export class coreClient {
 		})
 	}
 
-	async getBalance(address: Address): Promise<bigint> {
+	async getBalance(address: Address): Promise<string> {
 		if (!isCoreAddress(address)) {
 			throw new Error('Invalid address')
 		}
 		try {
-			return await this.public.getBalance({ address })
+			return formatCFX(await this.public.getBalance({ address }))
 		} catch (error) {
 			throw new Error(`Failed to get balance: ${error.message}`)
 		}

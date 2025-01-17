@@ -10,6 +10,7 @@ import {
 	parseEther,
 	PublicClient,
 	WalletClient,
+	formatEther
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 
@@ -80,12 +81,12 @@ export class espaceClient {
 		}
 	}
 
-	async getBalance(address: Address) {
+	async getBalance(address: Address): Promise<string> {
 		if (!isAddress(address)) {
 			throw new Error('Invalid address')
 		}
 		try {
-			return await this.public.getBalance({ address: address })
+			return formatEther(await this.public.getBalance({ address: address }))
 		} catch (error) {
 			throw new Error(`Failed to get balance: ${error.message}`)
 		}

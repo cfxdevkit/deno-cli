@@ -84,7 +84,7 @@ export class DevkitCLI {
 					await this.server.startServer()
 					const cfg = this.server.getConfig()
 					this.txScan.initializeClients(cfg)
-					this.txScan.setFooter(`${this.wallet.getActiveMnemonicLabel()} | [f]: Faucet [q]: Quit`)
+					this.txScan.setFooter(`${this.wallet.getActiveMnemonicLabel()} | [f]: Faucet [b]: Balance [q]: Quit`)
 
 					this.txScan.watchTransactions()
 
@@ -261,41 +261,78 @@ export class DevkitCLI {
 					exit = false
 				}
 				if (key.name === 'f') {
-					this.txScan.unwatch?.()
-					const address = await Input.prompt({
-						message: `Enter destination address: `,
-						validate: (address) => {
-							if (!(isCoreAddress(address) || isEspaceAddress(address))) {
-								return 'Please enter a valid core or espace address.'
-							}
-							return true
-						},
-					})
-					const amount = await Input.prompt({
-						message: `Enter amount: `,
-						default: '100',
-						validate: (value) => {
-							// Validate numerical inputs
-							if (isNaN(Number(value))) {
-								return 'Please enter a valid number.'
-							}
-							return true
-						},
-					})
-
-					try {
-						const mw = this.server?.getMinerWallet()
-						if (mw && address && amount) {
-							await mw.faucet(address as `0x${string}` | Address, amount)
-						}
-					} catch (error) {
-						console.error('An error occurred:', error)
-					}
-
-					this.txScan.watchTransactions()
+					await this.handleFaucet()
+				}
+				if (key.name === 'b') {
+					await this.handleBalance()
 				}
 			}
 		}
+	}
+
+	private async handleFaucet() {
+		this.txScan.unwatch?.()
+		const address = await Input.prompt({
+			message: `Enter destination address: `,
+			validate: (address) => {
+				if (!(isCoreAddress(address) || isEspaceAddress(address))) {
+					return 'Please enter a valid core or espace address.'
+				}
+				return true
+			},
+		})
+		const amount = await Input.prompt({
+			message: `Enter amount: `,
+			default: '100',
+			validate: (value) => {
+				if (isNaN(Number(value))) {
+					return 'Please enter a valid number.'
+				}
+				return true
+			},
+		})
+
+		try {
+			const mw = this.server?.getMinerWallet()
+			if (mw && address && amount) {
+				await mw.faucet(address as `0x${string}` | Address, amount)
+			}
+		} catch (error) {
+			console.error('An error occurred:', error)
+		}
+
+		this.txScan.watchTransactions()
+	}
+
+	private async handleBalance() {
+		this.txScan.unwatch?.()
+		try {
+			const address = await Input.prompt({
+				message: `Enter address to check balance: `,
+				validate: (address) => {
+					if (!(isCoreAddress(address) || isEspaceAddress(address))) {
+						return 'Please enter a valid core or espace address.'
+					}
+					return true
+				},
+			})
+
+			if (address) {
+				const balance = isEspaceAddress(address) 
+					? await this.txScan.espaceClient?.getBalance(address as `0x${string}`)
+					: await this.txScan.coreClient?.getBalance(address as Address)
+
+				if (balance !== undefined) {
+					console.log(`\nBalance: ${balance} CFX`)
+				} else {
+					console.error('Failed to fetch balance')
+				}
+			}
+		} catch (error) {
+			console.error('An error occurred:', error)
+		}
+
+		this.txScan.watchTransactions()
 	}
 
 	public async parseArguments() {
