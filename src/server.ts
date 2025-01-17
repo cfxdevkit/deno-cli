@@ -20,22 +20,31 @@ export class ServerManager {
 	}
 
 	private async initializeChain(wallet: Wallet, miner: `0x${string}`) {
-		const miner_account = privateKeyToAccount(
-			miner,
-			{ networkId: this.cfg.chainId },
-		)
-		this.cfg.miningAuthor = miner_account.address
+		try {
+			const miner_account = privateKeyToAccount(
+				miner,
+				{ networkId: this.cfg.chainId },
+			)
+			this.cfg.miningAuthor = miner_account.address
 
-		this.cfg.genesisSecrets = await Promise.all(
-			Array.from({ length: 10 }, (_, i) => wallet.corePrivateKey(i))
-		) as `0x${string}`[]
-		this.cfg.genesisSecrets.push(miner)
+			this.cfg.genesisSecrets = await Promise.all(
+				Array.from({ length: 10 }, (_, i) => wallet.corePrivateKey(i))
+			).catch(error => {
+				throw new Error(`Failed to generate core private keys: ${error.message}`)
+			}) as `0x${string}`[]
+			this.cfg.genesisSecrets.push(miner)
 
-		this.cfg.genesisEvmSecrets = await Promise.all(
-			Array.from({ length: 10 }, (_, i) => wallet.espacePrivateKey(i))
-		) as `0x${string}`[]
+			this.cfg.genesisEvmSecrets = await Promise.all(
+				Array.from({ length: 10 }, (_, i) => wallet.espacePrivateKey(i))
+			).catch(error => {
+				throw new Error(`Failed to generate evm private keys: ${error.message}`)
+			}) as `0x${string}`[]
 
-		this.minerWallet = new coreClient(this.cfg, this.cfg.genesisSecrets.length - 1)
+			this.minerWallet = new coreClient(this.cfg, this.cfg.genesisSecrets.length - 1)
+		} catch (error) {
+			console.error('Failed to initialize chain:', error)
+			throw error // Re-throw to be caught by the constructor's catch
+		}
 	}
 
 	public async startServer() {

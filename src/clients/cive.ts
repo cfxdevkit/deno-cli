@@ -26,6 +26,9 @@ export class coreClient {
 		if (!cfg.genesisSecrets || !cfg.chainId) {
 			throw new Error('Invalid configuration: Missing chainId or genesisSecrets.')
 		}
+		if (index < 0 || index >= cfg.genesisSecrets.length) {
+			throw new Error(`Invalid index: ${index}. Must be between 0 and ${cfg.genesisSecrets.length - 1}`)
+		}
 		this.cfg = cfg
 		this.chain = defineChain({
 			id: this.cfg.chainId!,
@@ -61,40 +64,63 @@ export class coreClient {
 	}
 
 	async getBalance(address: Address): Promise<bigint> {
-		return await this.public.getBalance({ address })
+		if (!isCoreAddress(address)) {
+			throw new Error('Invalid address')
+		}
+		try {
+			return await this.public.getBalance({ address })
+		} catch (error) {
+			throw new Error(`Failed to get balance: ${error.message}`)
+		}
 	}
 
 	async sendTransaction(address: Address, amount: string): Promise<string> {
-		return await this.wallet.sendTransaction({
-			to: address,
-			value: parseCFX(amount),
-			account: this.account,
-			chain: this.chain,
-		})
+		if (!isCoreAddress(address)) {
+			throw new Error('Invalid address')
+		}
+		if (!amount || isNaN(Number(amount))) {
+			throw new Error('Invalid amount: Must be a valid number')
+		}
+		try {
+			return await this.wallet.sendTransaction({
+				to: address,
+				value: parseCFX(amount),
+				account: this.account,
+				chain: this.chain,
+			})
+		} catch (error) {
+			throw new Error(`Transaction failed: ${error.message}`)
+		}
 	}
 
 	async faucet(address: `0x${string}` | Address, amount: string): Promise<string> {
-		if (isEspaceAddress(address)) {
-			return await this.wallet.sendTransaction({
-				chain: this.chain,
-				account: this.account,
-				to: hexAddressToBase32({
-					hexAddress: '0x0888000000000000000000000000000000000006',
-					networkId: this.chain.id,
-				}),
-				value: parseCFX(amount),
-				data: encodeFunctionData({
-					abi: (await import('./csc.abi.json', {
-						with: { type: 'json' },
-					})).default,
-					functionName: 'transferEVM',
-					args: [address],
-				}),
-			})
-		} else if (isCoreAddress(address)) {
-			return this.sendTransaction(address, amount)
-		} else {
-			throw new Error('Wrong address')
+		if (!amount || isNaN(Number(amount))) {
+			throw new Error('Invalid amount: Must be a valid number')
+		}
+		try {
+			if (isEspaceAddress(address)) {
+				return await this.wallet.sendTransaction({
+					chain: this.chain,
+					account: this.account,
+					to: hexAddressToBase32({
+						hexAddress: '0x0888000000000000000000000000000000000006',
+						networkId: this.chain.id,
+					}),
+					value: parseCFX(amount),
+					data: encodeFunctionData({
+						abi: (await import('./csc.abi.json', {
+							with: { type: 'json' },
+						})).default,
+						functionName: 'transferEVM',
+						args: [address],
+					}),
+				})
+			} else if (isCoreAddress(address)) {
+				return this.sendTransaction(address, amount)
+			}
+			throw new Error('Invalid address format')
+		} catch (error) {
+			throw new Error(`Faucet transaction failed: ${error.message}`)
 		}
 	}
 
@@ -106,23 +132,38 @@ export class coreClient {
 			emitMissed: false,
 			epochTag: 'latest_mined',
 			onEpochNumber: async (epochNumber: bigint) => {
-				const blockHashes = await this.public.getBlocksByEpoch({ epochNumber })
-				for (const hash of blockHashes) {
-					const block = await this.public.getBlock({ blockHash: hash as `0x${string}` })
-					onNewBlock(block)
+				try {
+					const blockHashes = await this.public.getBlocksByEpoch({ epochNumber })
+					for (const hash of blockHashes) {
+						try {
+							const block = await this.public.getBlock({ blockHash: hash as `0x${string}` })
+							onNewBlock(block)
 
-					await Promise.all(
-						block.transactions.map(async (txHash: `0x${string}`) => {
-							const tx = await this.public.getTransaction({ hash: txHash })
-							onNewTransaction(tx as Transaction)
-						}),
-					)
+							await Promise.all(
+								block.transactions.map(async (txHash: `0x${string}`) => {
+									try {
+										const tx = await this.public.getTransaction({ hash: txHash })
+										onNewTransaction(tx as Transaction)
+									} catch (error) {
+										console.error(`Failed to get transaction ${txHash}: ${error.message}`)
+									}
+								}),
+							)
+						} catch (error) {
+							console.error(`Failed to process block ${hash}: ${error.message}`)
+						}
+					}
+				} catch (error) {
+					console.error(`Failed to get blocks for epoch ${epochNumber}: ${error.message}`)
 				}
 			},
 		})
 	}
 
 	async getTokenBalance(tokenAddress: Address): Promise<string> {
+		if (!isCoreAddress(tokenAddress)) {
+			throw new Error('Invalid token address')
+		}
 		const [balance, decimals] = await Promise.all([
 			this.public.readContract({
 				address: tokenAddress,
