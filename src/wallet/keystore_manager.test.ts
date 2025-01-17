@@ -88,9 +88,9 @@ Deno.test('KeystoreManager - handle keystore modifications', async () => {
 		const entries = [
 			{ type: 'plaintext', label: 'Key 1', mnemonic: 'mnemonic1' },
 			{ type: 'plaintext', label: 'Key 2', mnemonic: 'mnemonic2' },
-			{ type: 'plaintext', label: 'Key 3', mnemonic: 'mnemonic3' }
+			{ type: 'plaintext', label: 'Key 3', mnemonic: 'mnemonic3' },
 		] as KeystoreEntry[]
-		
+
 		manager.setKeystore(entries)
 		manager.setActiveIndex(2)
 		await manager.writeKeystore()
@@ -98,11 +98,11 @@ Deno.test('KeystoreManager - handle keystore modifications', async () => {
 		// Remove middle entry
 		const keystore = manager.getKeystore()
 		keystore.splice(1, 1)
-		
+
 		// Verify length and active index behavior
 		assertEquals(keystore.length, 2)
 		assertEquals(manager.getActiveIndex(), 2)
-		
+
 		// Write and read back
 		await manager.writeKeystore()
 		const readKeystore = await manager.readKeystore()

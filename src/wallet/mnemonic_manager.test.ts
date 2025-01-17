@@ -251,7 +251,7 @@ await snapshotTest({
 	async fn() {
 		resetMockKeystore()
 		mockKeystoreManager.setKeystore([
-			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic }
+			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
 		])
 
 		await assertRejects(
@@ -259,9 +259,9 @@ await snapshotTest({
 				await mnemonicManager.deleteMnemonic(0)
 			},
 			Error,
-			'Cannot delete the default mnemonic as it serves as a fallback'
+			'Cannot delete the default mnemonic as it serves as a fallback',
 		)
-	}
+	},
 })
 
 await snapshotTest({
@@ -271,7 +271,7 @@ await snapshotTest({
 		resetMockKeystore()
 		mockKeystoreManager.setKeystore([
 			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
-			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2 test2 test2' }
+			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2 test2 test2' },
 		])
 		mockKeystoreManager.setActiveIndex(1)
 
@@ -281,7 +281,7 @@ await snapshotTest({
 		assertEquals(keystore.length, 1)
 		assertEquals(keystore[0].label, 'Default Keystore')
 		assertEquals(mockKeystoreManager.getActiveIndex(), 0)
-	}
+	},
 })
 
 await snapshotTest({
@@ -292,7 +292,7 @@ await snapshotTest({
 		mockKeystoreManager.setKeystore([
 			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
 			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2' },
-			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' }
+			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' },
 		])
 		mockKeystoreManager.setActiveIndex(2)
 
@@ -300,7 +300,7 @@ await snapshotTest({
 
 		assertEquals(mockKeystoreManager.getActiveIndex(), 0)
 		assertEquals(mockKeystoreManager.getKeystore().length, 2)
-	}
+	},
 })
 
 await snapshotTest({
@@ -311,7 +311,7 @@ await snapshotTest({
 		mockKeystoreManager.setKeystore([
 			{ type: 'plaintext', label: 'Default Keystore', mnemonic: mnemonic },
 			{ type: 'plaintext', label: 'Second Mnemonic', mnemonic: 'test2' },
-			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' }
+			{ type: 'plaintext', label: 'Third Mnemonic', mnemonic: 'test3' },
 		])
 		mockKeystoreManager.setActiveIndex(2)
 
@@ -319,5 +319,5 @@ await snapshotTest({
 
 		assertEquals(mockKeystoreManager.getActiveIndex(), 1)
 		assertEquals(mockKeystoreManager.getKeystore().length, 2)
-	}
+	},
 })

@@ -4,12 +4,12 @@ import {
 	Chain,
 	createPublicClient,
 	createWalletClient,
+	formatUnits,
 	http,
+	isAddress,
 	parseEther,
 	PublicClient,
 	WalletClient,
-	formatUnits,
-	isAddress,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 
@@ -114,7 +114,7 @@ export class espaceClient {
 							} catch (error) {
 								console.error(`Failed to get transaction ${element}: ${error.message}`)
 							}
-						})
+						}),
 					)
 				} catch (error) {
 					console.error(`Failed to process block ${block.number}: ${error.message}`)
@@ -136,7 +136,7 @@ export class espaceClient {
 						type: 'function',
 						inputs: [{ name: 'account', type: 'address' }],
 						outputs: [{ name: '', type: 'uint256' }],
-						stateMutability: 'view'
+						stateMutability: 'view',
 					}],
 					functionName: 'balanceOf',
 					args: [this.address],
@@ -148,12 +148,12 @@ export class espaceClient {
 						type: 'function',
 						inputs: [],
 						outputs: [{ name: '', type: 'uint8' }],
-						stateMutability: 'view'
+						stateMutability: 'view',
 					}],
 					functionName: 'decimals',
-				})
-			]);
-			return this.formatTokenAmount(balance, decimals);
+				}),
+			])
+			return this.formatTokenAmount(balance, decimals)
 		} catch (error) {
 			throw new Error(`Failed to get token balance: ${error.message}`)
 		}
@@ -171,8 +171,8 @@ export class espaceClient {
 	}
 
 	formatTokenAmount(amount: bigint | string, decimals: number): string {
-		const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount;
-		const formatted = formatUnits(amountBigInt, decimals);
-		return Number(formatted).toFixed(4);
+		const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount
+		const formatted = formatUnits(amountBigInt, decimals)
+		return Number(formatted).toFixed(4)
 	}
 }

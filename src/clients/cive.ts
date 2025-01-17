@@ -8,7 +8,13 @@ import {
 	PublicClient,
 	WalletClient,
 } from 'cive'
-import { defineChain, encodeFunctionData, hexAddressToBase32, isAddress as isCoreAddress, formatUnits } from 'cive/utils'
+import {
+	defineChain,
+	encodeFunctionData,
+	formatUnits,
+	hexAddressToBase32,
+	isAddress as isCoreAddress,
+} from 'cive/utils'
 import { Account, privateKeyToAccount } from 'cive/accounts'
 import { Config } from '@xcfx/node'
 import { isAddress as isEspaceAddress } from 'viem'
@@ -172,7 +178,7 @@ export class coreClient {
 					type: 'function',
 					inputs: [{ name: 'account', type: 'address' }],
 					outputs: [{ name: '', type: 'uint256' }],
-					stateMutability: 'view'
+					stateMutability: 'view',
 				}],
 				functionName: 'balanceOf',
 				args: [this.address],
@@ -184,24 +190,24 @@ export class coreClient {
 					type: 'function',
 					inputs: [],
 					outputs: [{ name: '', type: 'uint8' }],
-					stateMutability: 'view'
+					stateMutability: 'view',
 				}],
 				functionName: 'decimals',
-			})
-		]);
+			}),
+		])
 
-		return this.formatTokenAmount(balance, decimals);
+		return this.formatTokenAmount(balance, decimals)
 	}
 
 	async waitForTransaction(hash: `0x${string}`): Promise<void> {
 		await this.public.waitForTransactionReceipt({
 			hash,
-		});
+		})
 	}
 
 	formatTokenAmount(amount: bigint | string, decimals: number): string {
-		const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount;
-		const formatted = formatUnits(amountBigInt, decimals);
-		return Number(formatted).toFixed(4);
+		const amountBigInt = typeof amount === 'string' ? BigInt(amount) : amount
+		const formatted = formatUnits(amountBigInt, decimals)
+		return Number(formatted).toFixed(4)
 	}
 }
