@@ -93,6 +93,7 @@ ENV PATH $NODE_PATH:$PATH
 FROM devkit-nvm AS devkit-hardhat
 USER $USERNAME
 RUN npm install -g npm@latest
+RUN npm install -g pnpm@latest-10
 RUN npm install --global hardhat-shorthand \
     && yes | hardhat-completion install
 
