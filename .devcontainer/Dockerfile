@@ -98,7 +98,7 @@ RUN npm install --global hardhat-shorthand \
     && yes | hardhat-completion install
 RUN printf '%s\n' \
 'if [ -t 0 ] && [ -z "${HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE}" ]; then' \
-'    HARDHAT_VAR_DEPLOYER_ACCOUNT=$(devkit wallet private-key --core)' \
+'    HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE=$(devkit wallet private-key --core)' \
 '    if [ $? -eq 0 ] && [ -n "${HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE}" ]; then' \
 '        export HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE' \
 '    else' \
