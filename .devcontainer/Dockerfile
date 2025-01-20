@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         unzip \
         sqlite3 \
+        tmux \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p ${CONFLUX_ROOT} /workspaces
