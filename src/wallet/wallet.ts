@@ -29,9 +29,10 @@ export class Wallet {
 	/**
 	 * Creates a new wallet instance
 	 * @constructor
+	 * @param {string} [homeDir] - Optional home directory override for testing
 	 */
-	constructor() {
-		this.keystoreManager = new KeystoreManager()
+	constructor(homeDir?: string) {
+		this.keystoreManager = new KeystoreManager(homeDir)
 		this.mnemonicManager = new MnemonicManager(this.keystoreManager, new EncryptionService())
 	}
 

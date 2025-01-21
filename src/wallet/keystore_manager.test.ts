@@ -4,19 +4,30 @@ import { join } from '@std/path'
 import { ensureFileSync } from '@std/fs'
 import { KeystoreEntry } from '../types.ts'
 
-Deno.test('KeystoreManager - initialize and read keystore', async () => {
+async function createTestEnvironment() {
 	const tmpdir = await Deno.makeTempDir()
+	return {
+		tmpdir,
+		cleanup: async () => {
+			try {
+				await Deno.remove(tmpdir, { recursive: true })
+			} catch (_) {
+				// Ignore if directory doesn't exist
+			}
+		}
+	}
+}
+
+Deno.test('KeystoreManager - initialize and read keystore', async () => {
+	const { tmpdir, cleanup } = await createTestEnvironment()
 	const tempKeystorePath = join(tmpdir, '.devkit.keystore.json')
-	// Mock Deno.env to set HOME to current directory
-	const originalEnv = Deno.env.get
-	Deno.env.get = (key: string) => (key === 'HOME' ? tmpdir : originalEnv(key))
 
 	try {
 		// Ensure the test keystore file exists
 		ensureFileSync(tempKeystorePath)
 
 		// Initialize KeystoreManager
-		const manager = new KeystoreManager()
+		const manager = new KeystoreManager(tmpdir)
 		assertEquals(manager['keystorePath'], tempKeystorePath)
 
 		// Read empty keystore
@@ -35,53 +46,61 @@ Deno.test('KeystoreManager - initialize and read keystore', async () => {
 		assertEquals(updatedKeystore?.keystore[0].label, 'Test Key')
 		assertEquals(updatedKeystore?.activeIndex, 0)
 	} finally {
-		// Clean up test file and restore environment
-		await Deno.remove(tempKeystorePath)
-		Deno.env.get = originalEnv
+		await cleanup()
 	}
 })
 
-Deno.test('KeystoreManager - set and get keystore and active index', () => {
-	const manager = new KeystoreManager()
+Deno.test('KeystoreManager - set and get keystore and active index', async () => {
+	const { tmpdir, cleanup } = await createTestEnvironment()
 
-	// Set keystore entries
-	const mockKeystore = [
-		{ type: 'plaintext', label: 'Key 1', mnemonic: 'mnemonic1' } as KeystoreEntry,
-		{ type: 'plaintext', label: 'Key 2', mnemonic: 'mnemonic2' } as KeystoreEntry,
-	]
-	manager.setKeystore(mockKeystore)
+	try {
+		const manager = new KeystoreManager(tmpdir)
 
-	// Get keystore entries
-	const retrievedKeystore = manager.getKeystore()
-	assertEquals(retrievedKeystore.length, 2)
-	assertEquals(retrievedKeystore[0].label, 'Key 1')
+		// Set keystore entries
+		const mockKeystore = [
+			{ type: 'plaintext', label: 'Key 1', mnemonic: 'mnemonic1' } as KeystoreEntry,
+			{ type: 'plaintext', label: 'Key 2', mnemonic: 'mnemonic2' } as KeystoreEntry,
+		]
+		manager.setKeystore(mockKeystore)
 
-	// Set and get active index
-	manager.setActiveIndex(1)
-	assertEquals(manager.getActiveIndex(), 1)
+		// Get keystore entries
+		const retrievedKeystore = manager.getKeystore()
+		assertEquals(retrievedKeystore.length, 2)
+		assertEquals(retrievedKeystore[0].label, 'Key 1')
 
-	// Set active index to null and ensure default fallback
-	manager.setActiveIndex(null)
-	assertEquals(manager.getActiveIndex(), 0)
+		// Set and get active index
+		manager.setActiveIndex(1)
+		assertEquals(manager.getActiveIndex(), 1)
+
+		// Set active index to null and ensure default fallback
+		manager.setActiveIndex(null)
+		assertEquals(manager.getActiveIndex(), 0)
+	} finally {
+		await cleanup()
+	}
 })
 
 Deno.test('KeystoreManager - handle non-existent keystore file', async () => {
-	// Initialize KeystoreManager
-	const manager = new KeystoreManager()
-	manager.setKeystorePath('.wrong.path')
-	// Read non-existent keystore
-	const keystore = await manager.readKeystore()
-	assertEquals(keystore, null)
+	const { tmpdir, cleanup } = await createTestEnvironment()
+
+	try {
+		// Initialize KeystoreManager with a non-existent path
+		const manager = new KeystoreManager(tmpdir)
+		manager.setKeystorePath(join(tmpdir, '.wrong.path'))
+		// Read non-existent keystore
+		const keystore = await manager.readKeystore()
+		assertEquals(keystore, null)
+	} finally {
+		await cleanup()
+	}
 })
 
 Deno.test('KeystoreManager - handle keystore modifications', async () => {
-	const tmpdir = await Deno.makeTempDir()
+	const { tmpdir, cleanup } = await createTestEnvironment()
 	const tempKeystorePath = join(tmpdir, '.devkit.keystore.json')
-	const originalEnv = Deno.env.get
-	Deno.env.get = (key: string) => (key === 'HOME' ? tmpdir : originalEnv(key))
 
 	try {
-		const manager = new KeystoreManager()
+		const manager = new KeystoreManager(tmpdir)
 		manager.setKeystorePath(tempKeystorePath)
 
 		// Add entries
@@ -109,7 +128,6 @@ Deno.test('KeystoreManager - handle keystore modifications', async () => {
 		assertEquals(readKeystore?.keystore.length, 2)
 		assertEquals(readKeystore?.activeIndex, 2)
 	} finally {
-		await Deno.remove(tempKeystorePath)
-		Deno.env.get = originalEnv
+		await cleanup()
 	}
 })

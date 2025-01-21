@@ -56,18 +56,19 @@ export interface IKeystoreManager {
  */
 export class KeystoreManager implements IKeystoreManager {
 	/** Path to the keystore file */
-	public keystorePath: string
+	protected keystorePath: string
 	/** Array of keystore entries */
-	public keystore: KeystoreEntry[] = []
+	protected keystore: KeystoreEntry[] = []
 	/** Index of the active mnemonic */
-	public activeIndex: number | null = 0
+	protected activeIndex: number | null = 0
 
 	/**
 	 * Creates a new keystore manager instance
 	 * @constructor
+	 * @param {string} [homeDir] - Optional home directory override for testing
 	 */
-	constructor() {
-		this.keystorePath = join(Deno.env.get('HOME') || '', '.devkit.keystore.json')
+	constructor(homeDir?: string) {
+		this.keystorePath = join(homeDir || Deno.env.get('HOME') || '', '.devkit.keystore.json')
 		ensureFileSync(this.keystorePath)
 	}
 

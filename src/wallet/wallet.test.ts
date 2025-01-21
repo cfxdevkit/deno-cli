@@ -5,36 +5,39 @@ import { KeystoreManager } from './keystore_manager.ts'
 import { KeystoreEntry } from '../types.ts'
 const mnemonic = 'test test test test test test test test test test test junk'
 
-Deno.test('KeystoreManager - initialize and read keystore', async () => {
+async function createTestEnvironment() {
 	const tmpdir = await Deno.makeTempDir()
-	const tempKeystorePath = join(tmpdir, '.devkit.keystore.json')
-	// Mock Deno.env to set HOME to current directory
-	const originalEnv = Deno.env.get
-	Deno.env.get = (key: string) => (key === 'HOME' ? tmpdir : originalEnv(key))
+	return {
+		tmpdir,
+		cleanup: async () => {
+			try {
+				await Deno.remove(tmpdir, { recursive: true })
+			} catch (_) {
+				// Ignore if directory doesn't exist
+			}
+		}
+	}
+}
+
+Deno.test('KeystoreManager - initialize and read keystore', async () => {
+	const { tmpdir, cleanup } = await createTestEnvironment()
 
 	try {
-		const wallet = new Wallet()
+		const wallet = new Wallet(tmpdir)
 		await wallet.initializeKeystore()
 
 		assertEquals(await wallet.getActiveMnemonic(), mnemonic)
 		assertEquals(wallet.getActiveMnemonicLabel(), 'Default Keystore')
 	} finally {
-		// Clean up test file and restore environment
-		await Deno.remove(tempKeystorePath)
-		Deno.env.get = originalEnv
+		await cleanup()
 	}
 })
 
 Deno.test('KeystoreManager - Initialize keystore when keystore exists', async () => {
-	const tmpdir = await Deno.makeTempDir()
-	const tempKeystorePath = join(tmpdir, '.devkit.keystore.json')
-	// Mock Deno.env to set HOME to current directory
-	const originalEnv = Deno.env.get
-	Deno.env.get = (key: string) => (key === 'HOME' ? tmpdir : originalEnv(key))
+	const { tmpdir, cleanup } = await createTestEnvironment()
 
 	try {
-		// await wallet.initializeKeystore();
-		const km = new KeystoreManager()
+		const km = new KeystoreManager(tmpdir)
 		const existingKeystore = {
 			keystore: [
 				{ type: 'plaintext', label: 'My Mnemonic', mnemonic: 'test test test' } as KeystoreEntry,
@@ -43,19 +46,16 @@ Deno.test('KeystoreManager - Initialize keystore when keystore exists', async ()
 		}
 
 		km.setKeystore(existingKeystore.keystore)
-		km.setKeystorePath(tempKeystorePath)
 		km.setActiveIndex(existingKeystore.activeIndex)
-		km.writeKeystore()
-		km.readKeystore()
-		const wallet = new Wallet()
+		await km.writeKeystore()
+
+		const wallet = new Wallet(tmpdir)
 		await wallet.initializeKeystore()
 
 		const activeMnemonic = await wallet.getActiveMnemonic()
 		assertEquals(activeMnemonic, 'test test test')
 	} finally {
-		// Clean up test file and restore environment
-		await Deno.remove(tempKeystorePath)
-		Deno.env.get = originalEnv
+		await cleanup()
 	}
 })
 
