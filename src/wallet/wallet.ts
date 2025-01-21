@@ -234,6 +234,6 @@ export class Wallet {
 
 	async coreAddress(index: number): Promise<string> {
 		const privateKey = await this.corePrivateKey(index)
-		return corePrivateKeyToAccount(privateKey as `0x${string}`, { networkId: 1029 }).address
+		return corePrivateKeyToAccount(privateKey as `0x${string}`, { networkId: 2029 }).address
 	}
 }
