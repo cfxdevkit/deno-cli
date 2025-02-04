@@ -97,6 +97,8 @@ RUN npm install -g npm@latest
 RUN npm install -g pnpm@latest-10
 RUN npm install --global hardhat-shorthand \
     && yes | hardhat-completion install
+
+FROM devkit-hardhat AS devkit-hardhat-core
 RUN printf '%s\n' \
 'if [ -t 0 ] && [ -z "${HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE}" ]; then' \
 '    HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE=$(devkit wallet private-key --core)' \
@@ -106,6 +108,9 @@ RUN printf '%s\n' \
 '        echo "Failed to retrieve mnemonic or mnemonic is empty" >&2' \
 '    fi' \
 'fi' >> /home/${USERNAME}/.bashrc
+RUN echo "alias hardhat-var-update='export HARDHAT_VAR_DEPLOYER_ACCOUNT_CORE=\"\$(devkit wallet private-key --core)\"'" >> ~/.bash_aliases
+
+FROM devkit-hardhat AS devkit-hardhat-espace
 RUN printf '%s\n' \
 'if [ -t 0 ] && [ -z "${HARDHAT_VAR_DEPLOYER_MNEMONIC}" ]; then' \
 '    HARDHAT_VAR_DEPLOYER_MNEMONIC=$(devkit wallet show)' \
@@ -115,3 +120,4 @@ RUN printf '%s\n' \
 '        echo "Failed to retrieve mnemonic or mnemonic is empty" >&2' \
 '    fi' \
 'fi' >> /home/${USERNAME}/.bashrc
+RUN echo "alias hardhat-var-update='export HARDHAT_VAR_DEPLOYER_MNEMONIC=\"\$(devkit wallet show)\"'" >> ~/.bash_aliases

@@ -68,11 +68,22 @@ jobs:
         with:
           file: .devcontainer/Dockerfile
           context: .
-          target: devkit-hardhat
+          target: devkit-hardhat-espace
           push: true
           tags: |
-            cfxdevkit/devkit-hardhat:${{ github.ref_name }}
-            cfxdevkit/devkit-hardhat:latest
+            cfxdevkit/devkit-hardhat-espace:${{ github.ref_name }}
+            cfxdevkit/devkit-hardhat-espace:latest
+
+      - name: Build and push devkit-hardhat-core Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: .devcontainer/Dockerfile
+          context: .
+          target: devkit-hardhat-core
+          push: true
+          tags: |
+            cfxdevkit/devkit-hardhat-core:${{ github.ref_name }}
+            cfxdevkit/devkit-hardhat-core:latest
 
       # - name: Build and push devkit-hardhat-core Docker image
       #   uses: docker/build-push-action@v6

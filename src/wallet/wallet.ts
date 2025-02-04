@@ -84,7 +84,22 @@ export class Wallet {
 	 * @returns {Promise<void>}
 	 */
 	async addMnemonic(): Promise<void> {
-		await this.mnemonicManager.addMnemonic()
+		const newIndex = await this.mnemonicManager.addMnemonic()
+		
+		const setActive = await Select.prompt({
+			message: 'Would you like to set this as your active mnemonic?',
+			options: [
+				{ name: 'Yes', value: 'yes' },
+				{ name: 'No', value: 'no' },
+			],
+		})
+
+		if (setActive === 'yes') {
+			this.keystoreManager.setActiveIndex(newIndex)
+			await this.keystoreManager.writeKeystore()
+			this.mnemonic = await this.getActiveMnemonic()
+			console.log(`Active wallet set to: ${this.getActiveMnemonicLabel()}`)
+		}
 	}
 
 	/**

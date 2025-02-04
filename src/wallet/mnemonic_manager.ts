@@ -31,9 +31,9 @@ export class MnemonicManager {
 	/**
 	 * Adds a new mnemonic to the keystore
 	 * @async
-	 * @returns {Promise<void>}
+	 * @returns {Promise<number>} Index of the newly added mnemonic
 	 */
-	async addMnemonic(): Promise<void> {
+	async addMnemonic(): Promise<number> {
 		const storageChoice = await Select.prompt({
 			message: 'Choose storage option for the mnemonic:',
 			options: [
@@ -50,6 +50,8 @@ export class MnemonicManager {
 			default: defaultLabel,
 		})
 
+		const newIndex = this.keystoreManager.getKeystore().length
+
 		if (storageChoice === 'p') {
 			this.keystoreManager.getKeystore().push({ type: 'plaintext', label, mnemonic })
 		} else {
@@ -59,6 +61,8 @@ export class MnemonicManager {
 
 		await this.keystoreManager.writeKeystore()
 		console.error(storageChoice === 'p' ? 'Mnemonic stored in plaintext.' : 'Mnemonic stored securely.')
+		
+		return newIndex
 	}
 
 	/**
