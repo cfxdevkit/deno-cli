@@ -61,7 +61,7 @@ export class MnemonicManager {
 
 		await this.keystoreManager.writeKeystore()
 		console.error(storageChoice === 'p' ? 'Mnemonic stored in plaintext.' : 'Mnemonic stored securely.')
-		
+
 		return newIndex
 	}
 

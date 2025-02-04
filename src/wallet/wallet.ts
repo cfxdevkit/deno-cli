@@ -85,7 +85,7 @@ export class Wallet {
 	 */
 	async addMnemonic(): Promise<void> {
 		const newIndex = await this.mnemonicManager.addMnemonic()
-		
+
 		const setActive = await Select.prompt({
 			message: 'Would you like to set this as your active mnemonic?',
 			options: [
