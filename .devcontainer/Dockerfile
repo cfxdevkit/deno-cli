@@ -56,7 +56,7 @@ ENV LANG=C.UTF-8 \
 
 FROM devkit-vscode AS devkit-deno
 USER root
-COPY --from=denoland/deno:bin-2.1.6 /deno /usr/local/bin/deno
+COPY --from=denoland/deno:bin-2.1.9 /deno /usr/local/bin/deno
 USER $USERNAME 
 
 FROM devkit-deno AS cfx-deno-cli
@@ -84,12 +84,12 @@ CMD ["start"]
 FROM cfx-deno-cli AS devkit-nvm
 USER root
 RUN mkdir /opt/nvm
-ENV NVM_DIR /opt/nvm
-ENV NODE_VERSION v22.12.0
+ENV NVM_DIR=/opt/nvm
+ENV NODE_VERSION=v22.12.0
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use --delete-prefix $NODE_VERSION"
-ENV NODE_PATH $NVM_DIR/versions/node/$NODE_VERSION/bin
-ENV PATH $NODE_PATH:$PATH
+ENV NODE_PATH=$NVM_DIR/versions/node/$NODE_VERSION/bin
+ENV PATH=$NODE_PATH:$PATH
 
 FROM devkit-nvm AS devkit-hardhat
 USER $USERNAME
