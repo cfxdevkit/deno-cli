@@ -163,7 +163,7 @@ export class Wallet {
 		}
 
 		const seed = await bip39.mnemonicToSeed(mnemonic)
-		const root = bip32.fromSeed(Buffer.from(seed))
+		const root = bip32.fromSeed(new Uint8Array(seed))
 		const child = root.derivePath(derivationPath)
 
 		if (!child.privateKey) {
