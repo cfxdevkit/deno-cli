@@ -56,7 +56,7 @@ ENV LANG=C.UTF-8 \
 
 FROM devkit-vscode AS devkit-deno
 USER root
-COPY --from=denoland/deno:bin-2.1.9 /deno /usr/local/bin/deno
+COPY --from=denoland/deno:bin-2.3.3 /deno /usr/local/bin/deno
 USER $USERNAME 
 
 FROM devkit-deno AS cfx-deno-cli
