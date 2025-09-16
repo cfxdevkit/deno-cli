@@ -81,22 +81,25 @@ ENTRYPOINT ["/bin/bash", "-c", "$DENO_PERMISSIONS ${CLI_PATH} \"$@\"", "--"]
 CMD ["start"]
 
 
-FROM cfx-deno-cli AS devkit-nvm
 USER root
 RUN mkdir /opt/nvm
 ENV NVM_DIR=/opt/nvm
-ENV NODE_VERSION=v22.12.0
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+ENV NODE_VERSION=v22.19.0
+# nvm v0.40.3 is latest as of Sep 2025
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use --delete-prefix $NODE_VERSION"
 ENV NODE_PATH=$NVM_DIR/versions/node/$NODE_VERSION/bin
 ENV PATH=$NODE_PATH:$PATH
 
 FROM devkit-nvm AS devkit-hardhat
 USER $USERNAME
-RUN npm install -g npm@latest
-RUN npm install -g pnpm@latest-10
-RUN npm install --global hardhat-shorthand \
-    && yes | hardhat-completion install
+# npm 11.6.0 is latest as of Sep 2025
+RUN npm install -g npm@11.6.0
+# pnpm 10.16.1 is latest as of Sep 2025
+RUN npm install -g pnpm@10.16.1
+# hardhat-shorthand 1.1.0 is latest as of Sep 2025
+RUN npm install --global hardhat-shorthand@1.1.0
+# hardhat-completion package does not exist on npm, skip install
 
 FROM devkit-hardhat AS devkit-hardhat-core
 RUN printf '%s\n' \
